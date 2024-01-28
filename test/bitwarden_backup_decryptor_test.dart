@@ -81,8 +81,10 @@ void main() {
 
   group('createTestVault', () {
     test('Encrypts correctly', () {
-      expect(ctv.createTestVault(0), pbkdf2VaultContent);
-      expect(ctv.createTestVault(1), argon2idVaultContent);
+      expect(
+          jsonDecode(ctv.createTestVault(0)), jsonDecode(pbkdf2VaultContent));
+      expect(
+          jsonDecode(ctv.createTestVault(1)), jsonDecode(argon2idVaultContent));
       expect(() => ctv.createTestVault(2), throwsArgumentError);
     });
   }, timeout: Timeout(Duration(seconds: 300)));
