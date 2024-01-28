@@ -86,8 +86,8 @@ String createTestVault(int testKdfType) {
     encKey,
     macKey,
   );
-
-  final String encryptedVault = JsonEncoder.withIndent('  ').convert({
+  // Ensure UTF-8.
+  final String encryptedVault = utf8.decode(JsonUtf8Encoder('  ').convert({
     for (final MapEntry entry in {
       'encrypted': true,
       'passwordProtected': true,
@@ -100,7 +100,8 @@ String createTestVault(int testKdfType) {
       'data': data,
     }.entries)
       if (entry.value != null) entry.key: entry.value
-  });
+  }));
+
   return encryptedVault;
 }
 
