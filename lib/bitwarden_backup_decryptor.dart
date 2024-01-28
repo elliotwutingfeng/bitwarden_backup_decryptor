@@ -33,10 +33,10 @@ String _getPass({String prompt = ''}) {
 }
 
 /// Read encrypted vault content and read passphrase from user prompt.
-Future<(String vaultContent, String passphrase)> getInput(
+Future<(String? vaultContent, String? passphrase)> getInput(
     List<String> args) async {
   if (args.length != 1) {
-    throw ArgumentError('Usage: bitwarden_backup_decryptor.dart <filename>\n');
+    return (null, null);
   }
   final String filePath = args[0];
   final String vaultContent = await File(filePath).readAsString(encoding: utf8);
@@ -47,6 +47,10 @@ Future<(String vaultContent, String passphrase)> getInput(
 }
 
 void main(List<String> args) async {
-  final (String vaultContent, String passphrase) = await getInput(args);
+  final (String? vaultContent, String? passphrase) = await getInput(args);
+  if (vaultContent == null || passphrase == null) {
+    stderr.write('Usage: bitwarden_backup_decryptor.dart <filename>\n');
+    exit(1);
+  }
   stdout.write(decryptVault(vaultContent, passphrase));
 }

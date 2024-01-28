@@ -49,8 +49,10 @@ void main() {
               getInput([
                 ctv.testPbkdf2VaultFileName,
                 ctv.testPbkdf2VaultFileName
-              ]).then((_) {}),
-              throwsArgumentError);
+              ]).then((value) {
+                expect(value, (null, null));
+              }),
+              completes);
         },
         stdin: () => stdin,
       );
