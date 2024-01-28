@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bitwarden_backup_decryptor/src/decrypt_vault.dart';
@@ -25,7 +26,7 @@ String _getPass({String prompt = ''}) {
   stderr.write(prompt);
   final bool echoMode = stdin.echoMode;
   stdin.echoMode = false;
-  final String passphrase = stdin.readLineSync() ?? '';
+  final String passphrase = stdin.readLineSync(encoding: utf8) ?? '';
   stdin.echoMode = echoMode;
   stderr.write('\n');
   return passphrase;
@@ -38,7 +39,7 @@ Future<(String vaultContent, String passphrase)> getInput(
     throw ArgumentError('Usage: bitwarden_backup_decryptor.dart <filename>\n');
   }
   final String filePath = args[0];
-  final String vaultContent = await File(filePath).readAsString();
+  final String vaultContent = await File(filePath).readAsString(encoding: utf8);
   final String passphrase =
       _getPass(prompt: 'Enter Bitwarden encrypted backup password: ');
 

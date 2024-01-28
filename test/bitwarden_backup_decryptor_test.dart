@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bitwarden_backup_decryptor/bitwarden_backup_decryptor.dart';
@@ -25,15 +26,16 @@ class MockStdin extends Mock implements Stdin {}
 
 void main() {
   final String pbkdf2VaultContent =
-      File(ctv.testPbkdf2VaultFileName).readAsStringSync();
+      File(ctv.testPbkdf2VaultFileName).readAsStringSync(encoding: utf8);
   final String argon2idVaultContent =
-      File(ctv.testArgon2idVaultFileName).readAsStringSync();
+      File(ctv.testArgon2idVaultFileName).readAsStringSync(encoding: utf8);
 
   group('getInput', () {
     test('Captures input correctly', () {
       final MockStdin stdin = MockStdin();
 
-      when(() => stdin.readLineSync()).thenReturn(ctv.testPassphrase);
+      when(() => stdin.readLineSync(encoding: utf8))
+          .thenReturn(ctv.testPassphrase);
       when(() => stdin.echoMode).thenReturn(true);
 
       IOOverrides.runZoned(

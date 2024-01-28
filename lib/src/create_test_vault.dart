@@ -100,9 +100,7 @@ String createTestVault(int testKdfType) {
       'data': data,
     }.entries)
       if (entry.value != null) entry.key: entry.value
-  }).replaceAll('\r\n', '\n');
-  // None of the fields are expected to contain '\r' or '\n'
-  // so using replaceAll like this to resolve Windows behavior should be safe.
+  });
 
   return encryptedVault;
 }
