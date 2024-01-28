@@ -1,0 +1,28 @@
+include: package:lints/recommended.yaml
+
+linter:
+  rules:
+    - cascade_invocations
+    - directives_ordering
+    - lines_longer_than_80_chars
+    - noop_primitive_operations
+    - prefer_const_declarations
+    - prefer_expression_function_bodies
+    - prefer_final_in_for_each
+    - prefer_final_locals
+    - prefer_foreach
+    - prefer_single_quotes
+    - sort_pub_dependencies
+    - unawaited_futures
+    - unnecessary_parenthesis
+    - unnecessary_statements
+
+# analyzer:
+#   exclude:
+#     - path/to/excluded/files/**
+
+# For more information about the core and recommended set of lints, see
+# https://dart.dev/go/core-lints
+
+# For additional information about configuring this file, see
+# https://dart.dev/guides/language/analysis-options

@@ -1,0 +1,11 @@
+{
+  "encrypted": true,
+  "passwordProtected": true,
+  "salt": "rNYWSe/wFO1k+Qxia0A96A==",
+  "kdfType": 1,
+  "kdfIterations": 3,
+  "kdfMemory": 64,
+  "kdfParallelism": 4,
+  "encKeyValidation_DO_NOT_EDIT": "2.BCUsoLRgNgqJeJxut3xweg==|oEEkWdOX9yhyg0rloZtnLSJhqrrKxXswp6oHcfnMlF2xKVLgpnL7q36zq4YolQH1|j7ffuM4uu0bs1biwc6H4XfDjJ1+YxxDdO+pZfq6bhSY=",
+  "data": "2.ZWJYgGWulXafn/ABTx/Cuw==|hEz2OKp/Lo/eTLDu9wVuMhlvFJFYe35K2LgET16uJtqiKflRKp9H4w2UEr0dlz4pqapSnezA3RAdwvAlXkwr7g==|gaVpen79K//rHh/q+/B6ADw40JgFeY6UvQZpTdIcvqg="
+}

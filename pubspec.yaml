@@ -1,0 +1,17 @@
+name: bitwarden_backup_decryptor
+description: CLI tool to decrypt backup files exported from Bitwarden
+version: 0.0.1
+homepage: https://github.com/elliotwutingfeng/bitwarden_backup_decryptor
+
+environment:
+  sdk: ^3.2.6
+
+dependencies:
+  convert: ^3.1.1
+  pointycastle: ^3.7.4
+
+dev_dependencies:
+  coverage: ^1.7.2
+  lints: ^3.0.0
+  mocktail: ^1.0.3
+  test: ^1.25.2

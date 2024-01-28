@@ -1,0 +1,87 @@
+// CLI tool to decrypt backup files exported from Bitwarden
+// Copyright (C) 2024 Wu Tingfeng <wutingfeng@outlook.com>
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import 'dart:io';
+
+import 'package:bitwarden_backup_decryptor/bitwarden_backup_decryptor.dart';
+import 'package:bitwarden_backup_decryptor/src/create_test_vault.dart' as ctv;
+import 'package:mocktail/mocktail.dart';
+import 'package:test/test.dart';
+
+class MockStdin extends Mock implements Stdin {}
+
+void main() {
+  final String pbkdf2VaultContent =
+      File(ctv.testPbkdf2VaultFileName).readAsStringSync();
+  final String argon2idVaultContent =
+      File(ctv.testArgon2idVaultFileName).readAsStringSync();
+
+  group('getInput', () {
+    test('Captures input correctly', () {
+      final MockStdin stdin = MockStdin();
+
+      when(() => stdin.readLineSync()).thenReturn(ctv.testPassphrase);
+      when(() => stdin.echoMode).thenReturn(true);
+
+      IOOverrides.runZoned(
+        () {
+          expect(
+              getInput([ctv.testPbkdf2VaultFileName]).then((value) {
+                expect(value, (pbkdf2VaultContent, ctv.testPassphrase));
+              }),
+              completes);
+          expect(
+              getInput([
+                ctv.testPbkdf2VaultFileName,
+                ctv.testPbkdf2VaultFileName
+              ]).then((_) {}),
+              throwsArgumentError);
+        },
+        stdin: () => stdin,
+      );
+    });
+  }, timeout: Timeout(Duration(seconds: 10)));
+
+  group('decryptVault', () {
+    test('Correct password -> Decryption success', () {
+      expect(decryptVault(pbkdf2VaultContent, ctv.testPassphrase),
+          ctv.testVaultBody);
+      expect(decryptVault(argon2idVaultContent, ctv.testPassphrase),
+          ctv.testVaultBody);
+    });
+    test('Wrong password -> Decryption failure', () {
+      expect(() => decryptVault(pbkdf2VaultContent, ''), throwsFormatException);
+      expect(
+          () => decryptVault(argon2idVaultContent, ''), throwsFormatException);
+
+      expect(() => decryptVault(pbkdf2VaultContent, '${ctv.testPassphrase}A'),
+          throwsFormatException);
+      expect(() => decryptVault(argon2idVaultContent, '${ctv.testPassphrase}A'),
+          throwsFormatException);
+    });
+    test('Wrong vault format -> Decryption failure', () {
+      expect(() => decryptVault('', ''), throwsFormatException);
+    });
+  }, timeout: Timeout(Duration(seconds: 300)));
+
+  group('createTestVault', () {
+    test('Encrypts correctly', () {
+      expect(ctv.createTestVault(0), pbkdf2VaultContent);
+      expect(ctv.createTestVault(1), argon2idVaultContent);
+      expect(() => ctv.createTestVault(2), throwsArgumentError);
+    });
+  }, timeout: Timeout(Duration(seconds: 300)));
+}
