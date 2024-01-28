@@ -86,8 +86,8 @@ String createTestVault(int testKdfType) {
     encKey,
     macKey,
   );
-  // Ensure UTF-8.
-  final String encryptedVault = utf8.decode(JsonUtf8Encoder('  ').convert({
+
+  final String encryptedVault = JsonEncoder.withIndent('  ').convert({
     for (final MapEntry entry in {
       'encrypted': true,
       'passwordProtected': true,
@@ -100,7 +100,9 @@ String createTestVault(int testKdfType) {
       'data': data,
     }.entries)
       if (entry.value != null) entry.key: entry.value
-  }));
+  }).replaceAll('\r\n', '\n');
+  // None of the fields are expected to contain '\r' or '\n'
+  // so using replaceAll like this to resolve Windows behavior should be safe.
 
   return encryptedVault;
 }
