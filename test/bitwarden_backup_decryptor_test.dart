@@ -27,6 +27,8 @@ class MockStdin extends Mock implements Stdin {}
 final Matcher throwsIncorrectPasswordException =
     throwsA(isA<IncorrectPasswordException>());
 
+final Matcher throwsFileSystemException = throwsA(isA<FileSystemException>());
+
 void main() {
   final String pbkdf2VaultContent =
       File(ctv.testPbkdf2VaultFileName).readAsStringSync(encoding: utf8);
@@ -53,6 +55,9 @@ void main() {
         },
         stdin: () => stdin,
       );
+    });
+    test('Rejects invalid file path', () {
+      expect(() => getInput(['']), throwsFileSystemException);
     });
   }, timeout: Timeout(Duration(seconds: 10)));
 
