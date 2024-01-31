@@ -24,6 +24,9 @@ import 'package:test/test.dart';
 
 class MockStdin extends Mock implements Stdin {}
 
+final Matcher throwsIncorrectPasswordException =
+    throwsA(isA<IncorrectPasswordException>());
+
 void main() {
   final String pbkdf2VaultContent =
       File(ctv.testPbkdf2VaultFileName).readAsStringSync(encoding: utf8);
@@ -40,19 +43,13 @@ void main() {
 
       IOOverrides.runZoned(
         () {
+          expect(getInput([ctv.testPbkdf2VaultFileName]),
+              (pbkdf2VaultContent, ctv.testPassphrase));
+
           expect(
-              getInput([ctv.testPbkdf2VaultFileName]).then((value) {
-                expect(value, (pbkdf2VaultContent, ctv.testPassphrase, true));
-              }),
-              completes);
-          expect(
-              getInput([
-                ctv.testPbkdf2VaultFileName,
-                ctv.testPbkdf2VaultFileName
-              ]).then((value) {
-                expect(value, ('', '', false));
-              }),
-              completes);
+              () => getInput(
+                  [ctv.testPbkdf2VaultFileName, ctv.testPbkdf2VaultFileName]),
+              throwsArgumentError);
         },
         stdin: () => stdin,
       );
@@ -67,14 +64,15 @@ void main() {
           ctv.testVaultBody);
     });
     test('Wrong password -> Decryption failure', () {
-      expect(() => decryptVault(pbkdf2VaultContent, ''), throwsFormatException);
-      expect(
-          () => decryptVault(argon2idVaultContent, ''), throwsFormatException);
+      expect(() => decryptVault(pbkdf2VaultContent, ''),
+          throwsIncorrectPasswordException);
+      expect(() => decryptVault(argon2idVaultContent, ''),
+          throwsIncorrectPasswordException);
 
       expect(() => decryptVault(pbkdf2VaultContent, '${ctv.testPassphrase}A'),
-          throwsFormatException);
+          throwsIncorrectPasswordException);
       expect(() => decryptVault(argon2idVaultContent, '${ctv.testPassphrase}A'),
-          throwsFormatException);
+          throwsIncorrectPasswordException);
     });
     test('Wrong vault format -> Decryption failure', () {
       expect(() => decryptVault('', ''), throwsFormatException);

@@ -33,25 +33,39 @@ String _getPass({String prompt = ''}) {
 }
 
 /// Read encrypted vault content and read passphrase from user prompt.
-Future<(String vaultContent, String passphrase, bool validArgs)> getInput(
-    List<String> args) async {
+(String vaultContent, String passphrase) getInput(List<String> args) {
   if (args.length != 1) {
-    return ('', '', false);
+    throw ArgumentError('Usage: bitwarden_backup_decryptor.dart <filename>');
   }
   final String filePath = args[0];
-  final String vaultContent = await File(filePath).readAsString(encoding: utf8);
+  late String vaultContent;
+  try {
+    vaultContent = File(filePath).readAsStringSync(encoding: utf8);
+  } on FileSystemException catch (e) {
+    throw FileSystemException('${e.message}: ${e.path}');
+  }
   final String passphrase =
       _getPass(prompt: 'Enter Bitwarden encrypted backup password: ');
 
-  return (vaultContent, passphrase, true);
+  return (vaultContent, passphrase);
 }
 
-void main(List<String> args) async {
-  final (String vaultContent, String passphrase, bool validArgs) =
-      await getInput(args);
-  if (!validArgs) {
-    stderr.writeln('Usage: bitwarden_backup_decryptor.dart <filename>');
-    exit(1);
+void _terminate(String message) {
+  stderr.writeln(message);
+  exit(1);
+}
+
+void main(List<String> args) {
+  try {
+    final (String vaultContent, String passphrase) = getInput(args);
+    stdout.write(decryptVault(vaultContent, passphrase));
+  } on FormatException catch (e) {
+    _terminate(e.message);
+  } on IncorrectPasswordException catch (e) {
+    _terminate(e.message);
+  } on FileSystemException catch (e) {
+    _terminate(e.message);
+  } on ArgumentError catch (e) {
+    _terminate(e.message);
   }
-  stdout.write(decryptVault(vaultContent, passphrase));
 }

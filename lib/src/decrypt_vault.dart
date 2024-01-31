@@ -19,6 +19,11 @@ import 'dart:typed_data';
 
 import 'package:bitwarden_backup_decryptor/src/crypto.dart';
 
+class IncorrectPasswordException implements Exception {
+  final String message;
+  const IncorrectPasswordException(this.message);
+}
+
 /// Decrypt a Bitwarden [encrypted] string, given an encryption key [encKey] and
 /// MAC key [macKey].
 String _decrypt(String encrypted, Uint8List encKey, Uint8List macKey) {
@@ -38,7 +43,7 @@ String _decrypt(String encrypted, Uint8List encKey, Uint8List macKey) {
       .toBytes();
   final Uint8List finalMac = hmacSHA256Digest(macKey, b);
   if (!listEquals(mac, finalMac)) {
-    throw FormatException('Password incorrect');
+    throw IncorrectPasswordException('Password incorrect');
   }
 
   final Uint8List decryptor = aesCbc(encKey, iv, vault, false);
