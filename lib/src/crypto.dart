@@ -71,7 +71,7 @@ Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
               lanes: kdfParallelism ?? 4)))
         .process(utf8.encode(passphrase));
   } else {
-    throw ArgumentError('ERROR: unknown KDF!');
+    throw ArgumentError('Unknown KDF type');
   }
 
   final Uint8List encKey = hkdfExpand(key, utf8.encode('enc'), 32);

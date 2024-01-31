@@ -26,7 +26,7 @@ String _decrypt(String encrypted, Uint8List encKey, Uint8List macKey) {
   if (params.length != 3 ||
       params[0].length < 3 ||
       params[0].substring(0, 2) != '2.') {
-    throw FormatException('Invalid file format');
+    throw FormatException('Invalid vault format');
   }
   final Uint8List iv = base64.decode(params[0].substring(2));
   final Uint8List vault = base64.decode(params[1]);
@@ -38,7 +38,7 @@ String _decrypt(String encrypted, Uint8List encKey, Uint8List macKey) {
       .toBytes();
   final Uint8List finalMac = hmacSHA256Digest(macKey, b);
   if (!listEquals(mac, finalMac)) {
-    throw FormatException('MAC mismatch');
+    throw FormatException('Password incorrect');
   }
 
   final Uint8List decryptor = aesCbc(encKey, iv, vault, false);

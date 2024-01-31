@@ -42,7 +42,7 @@ void main() {
         () {
           expect(
               getInput([ctv.testPbkdf2VaultFileName]).then((value) {
-                expect(value, (pbkdf2VaultContent, ctv.testPassphrase));
+                expect(value, (pbkdf2VaultContent, ctv.testPassphrase, true));
               }),
               completes);
           expect(
@@ -50,7 +50,7 @@ void main() {
                 ctv.testPbkdf2VaultFileName,
                 ctv.testPbkdf2VaultFileName
               ]).then((value) {
-                expect(value, (null, null));
+                expect(value, ('', '', false));
               }),
               completes);
         },
