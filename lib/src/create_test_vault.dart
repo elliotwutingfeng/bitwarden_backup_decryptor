@@ -39,7 +39,8 @@ const String testArgon2idVaultFileName = 'test/encrypted_test_argon2id.json';
 String _encrypt(
     String plaintext, String ivB64, Uint8List encKey, Uint8List macKey) {
   final Uint8List iv = base64.decode(ivB64);
-  final Uint8List encodedPlaintext = utf8.encode(plaintext);
+  // ignore: unnecessary_cast
+  final Uint8List encodedPlaintext = utf8.encode(plaintext) as Uint8List;
   final Uint8List padded = pad(encodedPlaintext, 128 ~/ 8);
   final Uint8List encryptor = aesCbc(encKey, iv, padded, true);
 
