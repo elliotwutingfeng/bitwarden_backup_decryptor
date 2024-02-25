@@ -29,8 +29,9 @@ const String testVaultSalt = 'ZWJYgGWulXafn/ABTx/Cuw==';
 // Sample vault JSON retrieved from
 // https://bitwarden.com/help/condition-bitwarden-import/#condition-a-json
 const String testPlainTextVaultFileName = 'test/individual.json';
-final String testPlainTextVault =
-    File(testPlainTextVaultFileName).readAsStringSync(encoding: utf8);
+final String testPlainTextVault = File(testPlainTextVaultFileName)
+    .readAsStringSync(encoding: utf8)
+    .replaceAll('\r\n', '\n'); // Windows compatibility
 
 const Map<String, Map<String, String>> testEncryptedVaultFileName = {
   'PBKDF2': {
