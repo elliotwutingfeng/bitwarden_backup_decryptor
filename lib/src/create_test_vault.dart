@@ -24,14 +24,60 @@ const String testPassphrase = 'passphrase';
 const String testPassphraseSalt = 'rNYWSe/wFO1k+Qxia0A96A==';
 const String testEncKeyValidationBody = 'df5d795f-ba0e-545a-625b-17e6cd33e0bd';
 const String testEncKeyValidationSalt = 'BCUsoLRgNgqJeJxut3xweg==';
-const String testVaultBody = '''{
-  "encrypted": false,
-  "folders": [],
-  "items": []
-}''';
 const String testVaultSalt = 'ZWJYgGWulXafn/ABTx/Cuw==';
-const String testPbkdf2VaultFileName = 'test/encrypted_test_pbkdf2.json';
-const String testArgon2idVaultFileName = 'test/encrypted_test_argon2id.json';
+
+// Sample vault JSON retrieved from
+// https://bitwarden.com/help/condition-bitwarden-import/#condition-a-json
+const String testPlainTextVaultFileName = 'test/individual.json';
+final String testPlainTextVault = File(testPlainTextVaultFileName)
+    .readAsStringSync(encoding: utf8)
+    .replaceAll('\r\n', '\n'); // Windows compatibility
+
+const Map<String, Map<String, String>> testEncryptedVaultFileName = {
+  'PBKDF2': {
+    'default': 'test/encrypted_test_pbkdf2.json',
+    'maximum': 'test/encrypted_test_maximum_pbkdf2.json'
+  },
+  'Argon2id': {
+    'default': 'test/encrypted_test_argon2id.json',
+    'maximum': 'test/encrypted_test_maximum_argon2id.json'
+  }
+};
+final Map<String, Map<String, String>> testEncryptedVault = {
+  'PBKDF2': {
+    'default': File(testEncryptedVaultFileName['PBKDF2']!['default']!)
+        .readAsStringSync(encoding: utf8),
+    'maximum': File(testEncryptedVaultFileName['PBKDF2']!['maximum']!)
+        .readAsStringSync(encoding: utf8)
+  },
+  'Argon2id': {
+    'default': File(testEncryptedVaultFileName['Argon2id']!['default']!)
+        .readAsStringSync(encoding: utf8),
+    'maximum': File(testEncryptedVaultFileName['Argon2id']!['maximum']!)
+        .readAsStringSync(encoding: utf8)
+  }
+};
+
+// KDF settings at default and at maximum levels obtained from
+// https://vault.bitwarden.com/#/settings/security/security-keys
+const Map testKdfSettings = {
+  0: {
+    'default': {
+      'kdfIterations': 600000,
+      'kdfMemory': null,
+      'kdfParallelism': null
+    },
+    'maximum': {
+      'kdfIterations': 2000000,
+      'kdfMemory': null,
+      'kdfParallelism': null
+    },
+  },
+  1: {
+    'default': {'kdfIterations': 3, 'kdfMemory': 64, 'kdfParallelism': 4},
+    'maximum': {'kdfIterations': 10, 'kdfMemory': 1024, 'kdfParallelism': 16},
+  },
+};
 
 /// Encrypt a Bitwarden [plaintext] vault,
 /// given an initialization vector [ivB64],
@@ -53,18 +99,24 @@ String _encrypt(
   return '2.$ivB64|${base64.encode(encryptor)}|${base64.encode(finalMac)}';
 }
 
-/// Create an encrypted cyphertext vault of KDF type [testKdfType].
+/// Create an encrypted cyphertext vault of KDF type [testKdfType] and
+/// KDF settings strength level [testKdfStrength].
 ///
 /// testKdfType 0 -> PBKDF2
 ///
 /// testKdfType 1 -> Argon2id
-String createTestVault(int testKdfType) {
+String createTestVault(int testKdfType, String testKdfStrength) {
   if (testKdfType != 0 && testKdfType != 1) {
     throw ArgumentError('`kdfType` must be 0 or 1');
   }
-  final int testKdfIterations = (testKdfType == 1) ? 3 : 600000;
-  final int? testKdfMemory = (testKdfType == 1) ? 64 : null;
-  final int? testKdfParallelism = (testKdfType == 1) ? 4 : null;
+  if (testKdfStrength != 'default' && testKdfStrength != 'maximum') {
+    throw ArgumentError('`kdfStrength` must be default or maximum');
+  }
+
+  final Map settings = testKdfSettings[testKdfType][testKdfStrength];
+  final int testKdfIterations = settings['kdfIterations'];
+  final int? testKdfMemory = settings['kdfMemory'];
+  final int? testKdfParallelism = settings['kdfParallelism'];
 
   final (Uint8List encKey, Uint8List macKey) = getEncAndMacKeys(
     testPassphrase,
@@ -81,8 +133,9 @@ String createTestVault(int testKdfType) {
     encKey,
     macKey,
   );
+
   final String data = _encrypt(
-    testVaultBody,
+    testPlainTextVault,
     testVaultSalt,
     encKey,
     macKey,
@@ -107,6 +160,6 @@ String createTestVault(int testKdfType) {
 }
 
 void main(List<String> args) {
-  assert(args.length == 1);
-  stdout.write(createTestVault(int.parse(args[0])));
+  assert(args.length == 2);
+  stdout.write(createTestVault(int.parse(args[0]), args[1]));
 }
