@@ -30,11 +30,6 @@ final Matcher throwsIncorrectPasswordException =
 final Matcher throwsFileSystemException = throwsA(isA<FileSystemException>());
 
 void main() {
-  final String pbkdf2VaultContent =
-      File(ctv.testPbkdf2VaultFileName).readAsStringSync(encoding: utf8);
-  final String argon2idVaultContent =
-      File(ctv.testArgon2idVaultFileName).readAsStringSync(encoding: utf8);
-
   group('getInput', () {
     test('Captures input correctly', () {
       final MockStdin stdin = MockStdin();
@@ -45,13 +40,19 @@ void main() {
 
       IOOverrides.runZoned(
         () {
-          expect(getInput([ctv.testPbkdf2VaultFileName]),
-              (pbkdf2VaultContent, ctv.testPassphrase));
-
           expect(
-              () => getInput(
-                  [ctv.testPbkdf2VaultFileName, ctv.testPbkdf2VaultFileName]),
-              throwsArgumentError);
+              getInput([ctv.testEncryptedVaultFileName['PBKDF2']!['default']!]),
+              (
+                ctv.testEncryptedVault['PBKDF2']!['default']!,
+                ctv.testPassphrase
+              ));
+          expect(() => getInput([]), throwsArgumentError); // args too short
+          expect(
+              () => getInput([
+                    ctv.testEncryptedVaultFileName['PBKDF2']!['default']!,
+                    ctv.testEncryptedVaultFileName['PBKDF2']!['default']!
+                  ]),
+              throwsArgumentError); // args too long
         },
         stdin: () => stdin,
       );
@@ -62,35 +63,50 @@ void main() {
   }, timeout: Timeout(Duration(seconds: 10)));
 
   group('decryptVault', () {
-    test('Correct password -> Decryption success', () {
-      expect(decryptVault(pbkdf2VaultContent, ctv.testPassphrase),
-          ctv.testVaultBody);
-      expect(decryptVault(argon2idVaultContent, ctv.testPassphrase),
-          ctv.testVaultBody);
-    });
-    test('Wrong password -> Decryption failure', () {
-      expect(() => decryptVault(pbkdf2VaultContent, ''),
-          throwsIncorrectPasswordException);
-      expect(() => decryptVault(argon2idVaultContent, ''),
-          throwsIncorrectPasswordException);
+    for (final String strength in ['default', 'maximum']) {
+      test('Correct password -> Decryption success | KDF settings: $strength',
+          () {
+        expect(
+            decryptVault(ctv.testEncryptedVault['PBKDF2']![strength]!,
+                ctv.testPassphrase),
+            ctv.testPlainTextVault);
+        expect(
+            decryptVault(ctv.testEncryptedVault['Argon2id']![strength]!,
+                ctv.testPassphrase),
+            ctv.testPlainTextVault);
+      }, tags: strength);
 
-      expect(() => decryptVault(pbkdf2VaultContent, '${ctv.testPassphrase}A'),
-          throwsIncorrectPasswordException);
-      expect(() => decryptVault(argon2idVaultContent, '${ctv.testPassphrase}A'),
-          throwsIncorrectPasswordException);
-    });
+      test('Wrong password -> Decryption failure | KDF settings: $strength',
+          () {
+        for (final String wrongPassphrase in ['', '${ctv.testPassphrase}A']) {
+          expect(
+              () => decryptVault(ctv.testEncryptedVault['PBKDF2']![strength]!,
+                  wrongPassphrase),
+              throwsIncorrectPasswordException);
+          expect(
+              () => decryptVault(ctv.testEncryptedVault['Argon2id']![strength]!,
+                  wrongPassphrase),
+              throwsIncorrectPasswordException);
+        }
+      }, tags: strength);
+    }
     test('Wrong vault format -> Decryption failure', () {
       expect(() => decryptVault('', ''), throwsFormatException);
     });
-  }, timeout: Timeout(Duration(seconds: 300)));
+  }, timeout: Timeout(Duration(minutes: 15)));
 
   group('createTestVault', () {
-    test('Encrypts correctly', () {
-      expect(
-          jsonDecode(ctv.createTestVault(0)), jsonDecode(pbkdf2VaultContent));
-      expect(
-          jsonDecode(ctv.createTestVault(1)), jsonDecode(argon2idVaultContent));
-      expect(() => ctv.createTestVault(2), throwsArgumentError);
-    });
-  }, timeout: Timeout(Duration(seconds: 300)));
+    for (final String strength in ['default', 'maximum']) {
+      test('Encrypts correctly | KDF settings: $strength', () {
+        expect(jsonDecode(ctv.createTestVault(0, strength)),
+            jsonDecode(ctv.testEncryptedVault['PBKDF2']![strength]!));
+        expect(jsonDecode(ctv.createTestVault(1, strength)),
+            jsonDecode(ctv.testEncryptedVault['Argon2id']![strength]!));
+
+        expect(
+            () => ctv.createTestVault(1, 'notAStrength'), throwsArgumentError);
+        expect(() => ctv.createTestVault(2, strength), throwsArgumentError);
+      }, tags: strength);
+    }
+  }, timeout: Timeout(Duration(minutes: 15)));
 }
