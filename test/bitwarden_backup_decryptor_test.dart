@@ -93,7 +93,7 @@ void main() {
     test('Wrong vault format -> Decryption failure', () {
       expect(() => decryptVault('', ''), throwsFormatException);
     });
-  }, timeout: Timeout(Duration(minutes: 15)));
+  }, timeout: Timeout(Duration(minutes: 5)));
 
   group('createTestVault', () {
     for (final String strength in ['default', 'maximum']) {
@@ -108,5 +108,5 @@ void main() {
         expect(() => ctv.createTestVault(2, strength), throwsArgumentError);
       }, tags: strength);
     }
-  }, timeout: Timeout(Duration(minutes: 15)));
+  }, timeout: Timeout(Duration(minutes: 5)));
 }
