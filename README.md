@@ -216,7 +216,7 @@ You should get the following plaintext output.
 
 ## Testing
 
-Tested on individual vaults as of Bitwarden Version Version 2024.2.2
+Tested on individual vaults as of Bitwarden Version 2024.2.2
 
 ### Default KDF settings
 
