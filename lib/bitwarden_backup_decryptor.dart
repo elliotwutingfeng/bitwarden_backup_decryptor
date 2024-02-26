@@ -35,7 +35,8 @@ String _getPass({String prompt = ''}) {
 /// Read encrypted vault content and read passphrase from user prompt.
 (String vaultContent, String passphrase) getInput(List<String> args) {
   if (args.length != 1) {
-    throw ArgumentError('Usage: bitwarden_backup_decryptor.dart <filename>');
+    throw ArgumentError(
+        'Usage: ${Platform.script.pathSegments.last} <filename>');
   }
   final String filePath = args[0];
   late String vaultContent;
