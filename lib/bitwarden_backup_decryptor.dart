@@ -22,7 +22,7 @@ import 'package:bitwarden_backup_decryptor/src/decrypt_vault.dart';
 export 'package:bitwarden_backup_decryptor/src/decrypt_vault.dart';
 
 /// Prompt user for password.
-String _getPass({String prompt = ''}) {
+String getPass({String prompt = ''}) {
   stderr.write(prompt);
   final bool echoMode = stdin.echoMode;
   stdin.echoMode = false;
@@ -32,8 +32,8 @@ String _getPass({String prompt = ''}) {
   return passphrase;
 }
 
-/// Read encrypted vault content and read passphrase from user prompt.
-(String vaultContent, String passphrase) getInput(List<String> args) {
+/// Read encrypted vault content from user prompt.
+Map<String, dynamic> getVault(List<String> args) {
   if (args.length != 1) {
     throw ArgumentError(
         'Usage: ${Platform.script.pathSegments.last} <filename>');
@@ -45,10 +45,13 @@ String _getPass({String prompt = ''}) {
   } on FileSystemException catch (e) {
     throw FileSystemException('${e.message}: ${e.path}');
   }
-  final String passphrase =
-      _getPass(prompt: 'Enter Bitwarden encrypted backup password: ');
-
-  return (vaultContent, passphrase);
+  late Map<String, dynamic> vault;
+  try {
+    vault = jsonDecode(vaultContent);
+  } on FormatException {
+    throw FormatException('Failed to parse JSON file. Invalid JSON?');
+  }
+  return vault;
 }
 
 void _terminate(String message) {
@@ -58,8 +61,10 @@ void _terminate(String message) {
 
 void main(List<String> args) {
   try {
-    final (String vaultContent, String passphrase) = getInput(args);
-    stdout.write(decryptVault(vaultContent, passphrase));
+    final Map<String, dynamic> vault = getVault(args);
+    final String passphrase =
+        getPass(prompt: 'Enter Bitwarden encrypted backup password: ');
+    stdout.write(decryptVault(vault, passphrase));
   } on FormatException catch (e) {
     _terminate(e.message);
   } on IncorrectPasswordException catch (e) {
