@@ -51,15 +51,13 @@ String _decrypt(String encrypted, Uint8List encKey, Uint8List macKey) {
   return utf8.decode(unpadder);
 }
 
-/// Decrypt [vaultContent] with [passphrase] and return result as plaintext.
-String decryptVault(String vaultContent, String passphrase) {
-  final Map<String, dynamic> m = jsonDecode(vaultContent);
-
-  final String passphraseSalt = m['salt'];
-  final int kdfType = m['kdfType'];
-  final int kdfIterations = m['kdfIterations'];
-  final int? kdfMemory = m['kdfMemory'];
-  final int? kdfParallelism = m['kdfParallelism'];
+/// Decrypt [vault] with [passphrase] and return result as plaintext.
+String decryptVault(Map<String, dynamic> vault, String passphrase) {
+  final String passphraseSalt = vault['salt'];
+  final int kdfType = vault['kdfType'];
+  final int kdfIterations = vault['kdfIterations'];
+  final int? kdfMemory = vault['kdfMemory'];
+  final int? kdfParallelism = vault['kdfParallelism'];
 
   final (Uint8List encKey, Uint8List macKey) = getEncAndMacKeys(
     passphrase,
@@ -70,8 +68,8 @@ String decryptVault(String vaultContent, String passphrase) {
     kdfParallelism,
   );
 
-  _decrypt(m['encKeyValidation_DO_NOT_EDIT'], encKey,
+  _decrypt(vault['encKeyValidation_DO_NOT_EDIT'], encKey,
       macKey); // throws exception if invalid
-  final String plainTextVault = _decrypt(m['data'], encKey, macKey);
+  final String plainTextVault = _decrypt(vault['data'], encKey, macKey);
   return plainTextVault;
 }

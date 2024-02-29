@@ -30,35 +30,37 @@ final Matcher throwsIncorrectPasswordException =
 final Matcher throwsFileSystemException = throwsA(isA<FileSystemException>());
 
 void main() {
-  group('getInput', () {
-    test('Captures input correctly', () {
+  group('getPass', () {
+    test('Captures passphrase correctly', () {
       final MockStdin stdin = MockStdin();
 
       when(() => stdin.readLineSync(encoding: utf8))
           .thenReturn(ctv.testPassphrase);
-      when(() => stdin.echoMode).thenReturn(true);
+      when(() => stdin.echoMode).thenReturn(false);
 
       IOOverrides.runZoned(
         () {
-          expect(
-              getInput([ctv.testEncryptedVaultFileName['PBKDF2']!['default']!]),
-              (
-                ctv.testEncryptedVault['PBKDF2']!['default']!,
-                ctv.testPassphrase
-              ));
-          expect(() => getInput([]), throwsArgumentError); // args too short
-          expect(
-              () => getInput([
-                    ctv.testEncryptedVaultFileName['PBKDF2']!['default']!,
-                    ctv.testEncryptedVaultFileName['PBKDF2']!['default']!
-                  ]),
-              throwsArgumentError); // args too long
+          expect(getPass(), ctv.testPassphrase);
         },
         stdin: () => stdin,
       );
     });
+  }, timeout: Timeout(Duration(seconds: 10)));
+
+  group('getVault', () {
+    test('Parses vault correctly', () {
+      expect(getVault([ctv.testEncryptedVaultFileName['PBKDF2']!['default']!]),
+          ctv.testEncryptedVault['PBKDF2']!['default']!);
+      expect(() => getVault([]), throwsArgumentError); // args too short
+      expect(
+          () => getVault([
+                ctv.testEncryptedVaultFileName['PBKDF2']!['default']!,
+                ctv.testEncryptedVaultFileName['PBKDF2']!['default']!
+              ]),
+          throwsArgumentError); // args too long
+    });
     test('Rejects invalid file path', () {
-      expect(() => getInput(['']), throwsFileSystemException);
+      expect(() => getVault(['']), throwsFileSystemException);
     });
   }, timeout: Timeout(Duration(seconds: 10)));
 
@@ -91,7 +93,7 @@ void main() {
       }, tags: strength);
     }
     test('Wrong vault format -> Decryption failure', () {
-      expect(() => decryptVault('', ''), throwsFormatException);
+      expect(() => decryptVault(jsonDecode(''), ''), throwsFormatException);
     });
   }, timeout: Timeout(Duration(minutes: 5)));
 
@@ -99,9 +101,9 @@ void main() {
     for (final String strength in ['default', 'maximum']) {
       test('Encrypts correctly | KDF settings: $strength', () {
         expect(jsonDecode(ctv.createTestVault(0, strength)),
-            jsonDecode(ctv.testEncryptedVault['PBKDF2']![strength]!));
+            ctv.testEncryptedVault['PBKDF2']![strength]!);
         expect(jsonDecode(ctv.createTestVault(1, strength)),
-            jsonDecode(ctv.testEncryptedVault['Argon2id']![strength]!));
+            ctv.testEncryptedVault['Argon2id']![strength]!);
 
         expect(
             () => ctv.createTestVault(1, 'notAStrength'), throwsArgumentError);

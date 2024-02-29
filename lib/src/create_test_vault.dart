@@ -43,18 +43,22 @@ const Map<String, Map<String, String>> testEncryptedVaultFileName = {
     'maximum': 'test/encrypted_test_maximum_argon2id.json'
   }
 };
-final Map<String, Map<String, String>> testEncryptedVault = {
+final Map<String, Map<String, Map<String, dynamic>>> testEncryptedVault = {
   'PBKDF2': {
-    'default': File(testEncryptedVaultFileName['PBKDF2']!['default']!)
-        .readAsStringSync(encoding: utf8),
-    'maximum': File(testEncryptedVaultFileName['PBKDF2']!['maximum']!)
-        .readAsStringSync(encoding: utf8)
+    'default': jsonDecode(
+        File(testEncryptedVaultFileName['PBKDF2']!['default']!)
+            .readAsStringSync(encoding: utf8)),
+    'maximum': jsonDecode(
+        File(testEncryptedVaultFileName['PBKDF2']!['maximum']!)
+            .readAsStringSync(encoding: utf8))
   },
   'Argon2id': {
-    'default': File(testEncryptedVaultFileName['Argon2id']!['default']!)
-        .readAsStringSync(encoding: utf8),
-    'maximum': File(testEncryptedVaultFileName['Argon2id']!['maximum']!)
-        .readAsStringSync(encoding: utf8)
+    'default': jsonDecode(
+        File(testEncryptedVaultFileName['Argon2id']!['default']!)
+            .readAsStringSync(encoding: utf8)),
+    'maximum': jsonDecode(
+        File(testEncryptedVaultFileName['Argon2id']!['maximum']!)
+            .readAsStringSync(encoding: utf8))
   }
 };
 
