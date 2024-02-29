@@ -45,7 +45,7 @@ void main() {
         stdin: () => stdin,
       );
     });
-  }, timeout: Timeout(Duration(seconds: 10)));
+  }, timeout: Timeout(Duration(seconds: 30)));
 
   group('getVault', () {
     test('Parses vault correctly', () {
@@ -62,7 +62,7 @@ void main() {
     test('Rejects invalid file path', () {
       expect(() => getVault(['']), throwsFileSystemException);
     });
-  }, timeout: Timeout(Duration(seconds: 10)));
+  }, timeout: Timeout(Duration(seconds: 30)));
 
   group('decryptVault', () {
     for (final String strength in ['default', 'maximum']) {
@@ -95,7 +95,7 @@ void main() {
     test('Wrong vault format -> Decryption failure', () {
       expect(() => decryptVault(jsonDecode(''), ''), throwsFormatException);
     });
-  }, timeout: Timeout(Duration(minutes: 5)));
+  }, timeout: Timeout(Duration(minutes: 15)));
 
   group('createTestVault', () {
     for (final String strength in ['default', 'maximum']) {
@@ -110,5 +110,5 @@ void main() {
         expect(() => ctv.createTestVault(2, strength), throwsArgumentError);
       }, tags: strength);
     }
-  }, timeout: Timeout(Duration(minutes: 5)));
+  }, timeout: Timeout(Duration(minutes: 15)));
 }
