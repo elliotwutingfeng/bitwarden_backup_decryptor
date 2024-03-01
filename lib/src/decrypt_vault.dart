@@ -53,19 +53,13 @@ String _decrypt(String encrypted, Uint8List encKey, Uint8List macKey) {
 
 /// Decrypt [vault] with [passphrase] and return result as plaintext.
 String decryptVault(Map<String, dynamic> vault, String passphrase) {
-  final String passphraseSalt = vault['salt'];
-  final int kdfType = vault['kdfType'];
-  final int kdfIterations = vault['kdfIterations'];
-  final int? kdfMemory = vault['kdfMemory'];
-  final int? kdfParallelism = vault['kdfParallelism'];
-
   final (Uint8List encKey, Uint8List macKey) = getEncAndMacKeys(
     passphrase,
-    passphraseSalt,
-    kdfType,
-    kdfIterations,
-    kdfMemory,
-    kdfParallelism,
+    vault['salt'],
+    vault['kdfType'],
+    vault['kdfIterations'],
+    vault['kdfMemory'],
+    vault['kdfParallelism'],
   );
 
   _decrypt(vault['encKeyValidation_DO_NOT_EDIT'], encKey,

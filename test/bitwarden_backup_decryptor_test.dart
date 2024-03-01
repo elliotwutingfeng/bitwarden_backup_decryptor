@@ -29,6 +29,8 @@ final Matcher throwsIncorrectPasswordException =
 
 final Matcher throwsFileSystemException = throwsA(isA<FileSystemException>());
 
+final Matcher throwsTypeError = throwsA(isA<TypeError>());
+
 void main() {
   group('getPass', () {
     test('Captures passphrase correctly', () {
@@ -62,6 +64,10 @@ void main() {
     test('Rejects invalid file path', () {
       expect(() => getVault(['']), throwsFileSystemException);
     });
+    test('Rejects invalid JSON file', () {
+      expect(() => getVault(['test/bitwarden_backup_decryptor_test.dart']),
+          throwsFormatException);
+    });
   }, timeout: Timeout(Duration(seconds: 30)));
 
   group('decryptVault', () {
@@ -94,6 +100,25 @@ void main() {
     }
     test('Wrong vault format -> Decryption failure', () {
       expect(() => decryptVault(jsonDecode(''), ''), throwsFormatException);
+      expect(
+          () => decryptVault(
+              jsonDecode('{"salt":"","kdfType":1,"kdfIterations":1,'
+                  '"kdfMemory":1,"kdfParallelism":1,'
+                  '"encKeyValidation_DO_NOT_EDIT":""}'),
+              ''),
+          throwsFormatException);
+      expect(
+          () => decryptVault(
+              jsonDecode('{"salt":null,"kdfType":null,"kdfIterations":null,'
+                  '"kdfMemory":null,"kdfParallelism":null}'),
+              ''),
+          throwsTypeError);
+      expect(
+          () => decryptVault(
+              jsonDecode('{"salt":"","kdfType":999,"kdfIterations":1,'
+                  '"kdfMemory":1,"kdfParallelism":1}'),
+              ''),
+          throwsArgumentError);
     });
   }, timeout: Timeout(Duration(minutes: 15)));
 

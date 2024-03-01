@@ -51,6 +51,18 @@ Map<String, dynamic> getVault(List<String> args) {
   } on FormatException {
     throw FormatException('Failed to parse JSON file. Invalid JSON?');
   }
+  final String passphraseSalt = // ignore: unused_local_variable
+      vault['salt'];
+  final int kdfType = vault['kdfType']; // ignore: unused_local_variable
+  final int kdfIterations = // ignore: unused_local_variable
+      vault['kdfIterations'];
+  final int? kdfMemory = vault['kdfMemory']; // ignore: unused_local_variable
+  final int? kdfParallelism = // ignore: unused_local_variable
+      vault['kdfParallelism'];
+  final String encKeyValidation = // ignore: unused_local_variable
+      vault['encKeyValidation_DO_NOT_EDIT'];
+  final String data = vault['data']; // ignore: unused_local_variable
+
   return vault;
 }
 
@@ -73,5 +85,7 @@ void main(List<String> args) {
     _terminate(e.message);
   } on ArgumentError catch (e) {
     _terminate(e.message);
+  } on TypeError catch (e) {
+    _terminate(e.toString());
   }
 }
