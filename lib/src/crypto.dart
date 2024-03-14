@@ -54,15 +54,13 @@ Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
   int? kdfMemory,
   int? kdfParallelism,
 ) {
-  // ignore: unnecessary_cast
-  final Uint8List salt = utf8.encode(passphraseSalt) as Uint8List;
+  final Uint8List salt = Uint8List.fromList(utf8.encode(passphraseSalt));
 
   late Uint8List key;
   if (kdfType == 0) {
     key = (PBKDF2KeyDerivator(HMac(SHA256Digest(), 64))
           ..init(Pbkdf2Parameters(salt, kdfIterations, 32)))
-        // ignore: unnecessary_cast
-        .process(utf8.encode(passphrase) as Uint8List);
+        .process(Uint8List.fromList(utf8.encode(passphrase)));
   } else if (kdfType == 1) {
     key = (Argon2BytesGenerator()
           ..init(Argon2Parameters(
@@ -71,16 +69,15 @@ Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
               iterations: kdfIterations,
               memory: (kdfMemory ?? 64) * 1024,
               lanes: kdfParallelism ?? 4)))
-        // ignore: unnecessary_cast
-        .process(utf8.encode(passphrase) as Uint8List);
+        .process(Uint8List.fromList(utf8.encode(passphrase)));
   } else {
     throw ArgumentError('Unknown KDF type');
   }
 
-  // ignore: unnecessary_cast
-  final Uint8List encKey = hkdfExpand(key, utf8.encode('enc') as Uint8List, 32);
-  // ignore: unnecessary_cast
-  final Uint8List macKey = hkdfExpand(key, utf8.encode('mac') as Uint8List, 32);
+  final Uint8List encKey =
+      hkdfExpand(key, Uint8List.fromList(utf8.encode('enc')), 32);
+  final Uint8List macKey =
+      hkdfExpand(key, Uint8List.fromList(utf8.encode('mac')), 32);
 
   return (encKey, macKey);
 }
