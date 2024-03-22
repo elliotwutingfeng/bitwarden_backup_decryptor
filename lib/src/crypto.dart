@@ -121,12 +121,12 @@ Uint8List aesCbc(
   return targetText;
 }
 
-/// Compare 2 lists element-by-element.
+/// Compare 2 lists element-by-element in constant-time.
 bool listEquals(List<dynamic> list1, List<dynamic> list2) {
-  if (identical(list1, list2)) return true;
   if (list1.length != list2.length) return false;
+  int mismatch = 0;
   for (int i = 0; i < list1.length; i++) {
-    if (list1[i] != list2[i]) return false;
+    mismatch |= list1[i] ^ list2[i];
   }
-  return true;
+  return mismatch == 0;
 }
