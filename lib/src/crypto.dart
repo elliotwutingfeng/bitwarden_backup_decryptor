@@ -50,14 +50,12 @@ Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
   int? kdfMemory,
   int? kdfParallelism,
 ) {
+  final Uint8List password = Uint8List.fromList(utf8.encode(passphrase));
   final Uint8List salt = Uint8List.fromList(utf8.encode(passphraseSalt));
   const int keyLength = 32;
   late Uint8List key;
   if (kdfType == 0) {
-    key = sha256
-        .pbkdf2(Uint8List.fromList(utf8.encode(passphrase)), salt,
-            kdfIterations, keyLength)
-        .bytes;
+    key = sha256.pbkdf2(password, salt, kdfIterations, keyLength).bytes;
   } else if (kdfType == 1) {
     key = Argon2(
             version: Argon2Version.v13,
@@ -67,7 +65,7 @@ Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
             parallelism: kdfParallelism ?? 4,
             memorySizeKB: (kdfMemory ?? 64) * 1024,
             salt: sha256.convert(salt).bytes)
-        .convert(Uint8List.fromList(utf8.encode(passphrase)))
+        .convert(password)
         .bytes;
   } else {
     throw ArgumentError('Unknown KDF type');
