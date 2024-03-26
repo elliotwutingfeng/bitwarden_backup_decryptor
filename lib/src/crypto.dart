@@ -51,18 +51,18 @@ Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
   int? kdfParallelism,
 ) {
   final Uint8List salt = Uint8List.fromList(utf8.encode(passphraseSalt));
-
+  const int keyLength = 32;
   late Uint8List key;
   if (kdfType == 0) {
     key = sha256
         .pbkdf2(Uint8List.fromList(utf8.encode(passphrase)), salt,
-            kdfIterations, 32)
+            kdfIterations, keyLength)
         .bytes;
   } else if (kdfType == 1) {
     key = Argon2(
             version: Argon2Version.v13,
             type: Argon2Type.argon2id,
-            hashLength: 32,
+            hashLength: keyLength,
             iterations: kdfIterations,
             parallelism: kdfParallelism ?? 4,
             memorySizeKB: (kdfMemory ?? 64) * 1024,
