@@ -17,18 +17,14 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:hashlib/hashlib.dart';
 import 'package:pointycastle/api.dart';
 import 'package:pointycastle/block/aes.dart';
 import 'package:pointycastle/block/modes/cbc.dart';
-import 'package:pointycastle/digests/sha256.dart';
-import 'package:pointycastle/key_derivators/api.dart';
-import 'package:pointycastle/key_derivators/argon2.dart';
-import 'package:pointycastle/key_derivators/pbkdf2.dart';
-import 'package:pointycastle/macs/hmac.dart';
 import 'package:pointycastle/paddings/pkcs7.dart';
 
 Uint8List hmacSHA256Digest(Uint8List key, Uint8List data) =>
-    (HMac(SHA256Digest(), 64)..init(KeyParameter(key))).process(data);
+    sha256.hmac(key).convert(data).bytes;
 
 /// Reference: https://en.wikipedia.org/wiki/HKDF
 Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
@@ -54,22 +50,23 @@ Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
   int? kdfMemory,
   int? kdfParallelism,
 ) {
+  final Uint8List password = Uint8List.fromList(utf8.encode(passphrase));
   final Uint8List salt = Uint8List.fromList(utf8.encode(passphraseSalt));
-
+  const int keyLength = 32;
   late Uint8List key;
   if (kdfType == 0) {
-    key = (PBKDF2KeyDerivator(HMac(SHA256Digest(), 64))
-          ..init(Pbkdf2Parameters(salt, kdfIterations, 32)))
-        .process(Uint8List.fromList(utf8.encode(passphrase)));
+    key = sha256.pbkdf2(password, salt, kdfIterations, keyLength).bytes;
   } else if (kdfType == 1) {
-    key = (Argon2BytesGenerator()
-          ..init(Argon2Parameters(
-              Argon2Parameters.ARGON2_id, SHA256Digest().process(salt),
-              desiredKeyLength: 32,
-              iterations: kdfIterations,
-              memory: (kdfMemory ?? 64) * 1024,
-              lanes: kdfParallelism ?? 4)))
-        .process(Uint8List.fromList(utf8.encode(passphrase)));
+    key = Argon2(
+            version: Argon2Version.v13,
+            type: Argon2Type.argon2id,
+            hashLength: keyLength,
+            iterations: kdfIterations,
+            parallelism: kdfParallelism ?? 4,
+            memorySizeKB: (kdfMemory ?? 64) * 1024,
+            salt: sha256.convert(salt).bytes)
+        .convert(password)
+        .bytes;
   } else {
     throw ArgumentError('Unknown KDF type');
   }
