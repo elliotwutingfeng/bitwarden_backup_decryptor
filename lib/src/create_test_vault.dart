@@ -163,7 +163,11 @@ String createTestVault(int testKdfType, String testKdfStrength) {
   return encryptedVault;
 }
 
+// coverage:ignore-start
 void main(List<String> args) {
-  assert(args.length == 2);
+  if (args.length != 2) {
+    throw ArgumentError('Number of arguments must be 2.');
+  }
   stdout.write(createTestVault(int.parse(args[0]), args[1]));
 }
+// coverage:ignore-end

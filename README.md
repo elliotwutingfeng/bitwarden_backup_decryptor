@@ -236,7 +236,7 @@ dart pub get
 dart test --exclude-tags maximum --coverage "coverage"
 
 # Generate `.lcov` report from `coverage` folder
-dart run coverage:format_coverage --lcov --in coverage --out coverage.lcov --report-on lib
+dart run coverage:format_coverage --lcov --check-ignore --in coverage --out coverage.lcov --report-on lib
 
 # Generate HTML code coverage report from `.lcov` report
 # Note: On macOS/Linux you need to have `lcov` installed on your system

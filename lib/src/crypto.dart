@@ -101,9 +101,15 @@ Uint8List unpad(Uint8List bytes) {
 /// To encrypt, set [encrypt] to true. To decrypt, set [encrypt] to false.
 Uint8List aesCbc(
     Uint8List key, Uint8List iv, Uint8List sourceText, bool encrypt) {
-  assert([16, 24, 32].contains(key.length));
-  assert(iv.length == 16);
-  assert(sourceText.length % 16 == 0);
+  if (![16, 24, 32].contains(key.length)) {
+    throw ArgumentError('key.length must be 16, 24, or 32.');
+  }
+  if (iv.length != 16) {
+    throw ArgumentError('iv.length must be 16.');
+  }
+  if (sourceText.length % 16 != 0) {
+    throw ArgumentError('sourceText.length must be a multiple of 16.');
+  }
   final CBCBlockCipher cbc = CBCBlockCipher(AESEngine())
     ..init(encrypt, ParametersWithIV(KeyParameter(key), iv));
 
@@ -113,7 +119,11 @@ Uint8List aesCbc(
   while (offset < sourceText.length) {
     offset += cbc.processBlock(sourceText, offset, targetText, offset);
   }
-  assert(offset == sourceText.length);
+  // coverage:ignore-start
+  if (sourceText.length != offset) {
+    throw ArgumentError('sourceText.length must be equal to offset.');
+  }
+  // coverage:ignore-end
 
   return targetText;
 }

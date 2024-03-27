@@ -16,9 +16,11 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:bitwarden_backup_decryptor/bitwarden_backup_decryptor.dart';
 import 'package:bitwarden_backup_decryptor/src/create_test_vault.dart' as ctv;
+import 'package:bitwarden_backup_decryptor/src/crypto.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -136,4 +138,17 @@ void main() {
       }, tags: strength);
     }
   }, timeout: Timeout(Duration(minutes: 15)));
+
+  group('aesCbc', () {
+    test('Reject arguments with invalid lengths', () {
+      expect(() => aesCbc(Uint8List(0), Uint8List(0), Uint8List(0), true),
+          throwsArgumentError);
+      expect(() => aesCbc(Uint8List(16), Uint8List(0), Uint8List(0), true),
+          throwsArgumentError);
+      expect(() => aesCbc(Uint8List(16), Uint8List(16), Uint8List(17), true),
+          throwsArgumentError);
+      expect(aesCbc(Uint8List(16), Uint8List(16), Uint8List(16), true),
+          base64Url.decode('ZulL1O-KLDuITPpZyjQrLg=='));
+    });
+  }, timeout: Timeout(Duration(seconds: 30)));
 }

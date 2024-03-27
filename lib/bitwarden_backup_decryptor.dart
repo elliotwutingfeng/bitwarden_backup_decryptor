@@ -66,6 +66,7 @@ Map<String, dynamic> getVault(List<String> args) {
   return vault;
 }
 
+// coverage:ignore-start
 void _terminate(String message) {
   stderr.writeln(message);
   exit(1);
@@ -89,3 +90,4 @@ void main(List<String> args) {
     _terminate(e.toString());
   }
 }
+// coverage:ignore-end
