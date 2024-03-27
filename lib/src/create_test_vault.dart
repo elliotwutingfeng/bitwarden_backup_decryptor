@@ -26,8 +26,8 @@ const String testEncKeyValidationBody = 'df5d795f-ba0e-545a-625b-17e6cd33e0bd';
 const String testEncKeyValidationSalt = 'BCUsoLRgNgqJeJxut3xweg==';
 const String testVaultSalt = 'ZWJYgGWulXafn/ABTx/Cuw==';
 
-// Sample vault JSON retrieved from
-// https://bitwarden.com/help/condition-bitwarden-import/#condition-a-json
+/// Sample vault JSON retrieved from
+/// https://bitwarden.com/help/condition-bitwarden-import/#condition-a-json
 const String testPlainTextVaultFileName = 'test/individual.json';
 final String testPlainTextVault = File(testPlainTextVaultFileName)
     .readAsStringSync(encoding: utf8)
@@ -62,8 +62,9 @@ final Map<String, Map<String, Map<String, dynamic>>> testEncryptedVault = {
   }
 };
 
-// KDF settings at default and at maximum levels obtained from
-// https://vault.bitwarden.com/#/settings/security/security-keys
+/// KDF settings at default and at maximum levels obtained from
+/// https://github.com/bitwarden/server/blob/main/src/Core/Constants.cs
+/// under public static class `AuthConstants`.
 const Map testKdfSettings = {
   0: {
     'default': {
