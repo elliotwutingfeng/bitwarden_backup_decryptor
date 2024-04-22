@@ -12,7 +12,7 @@ This application is not affiliated with Bitwarden, Inc.
 
 ## Requirements
 
-- **Dart SDK:** 3.0+
+- **Dart SDK:** 3.3+
 - **OS:** Either Windows, macOS, or Linux
 
 ## Install dependencies
