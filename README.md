@@ -12,7 +12,7 @@ This application is not affiliated with Bitwarden, Inc.
 
 ## Requirements
 
-- **Dart SDK:** 3.3+
+- **Minimum Dart SDK:** 3.5.0
 - **OS:** Either Windows, macOS, or Linux
 
 ## Install dependencies
@@ -216,7 +216,7 @@ You should get the following plaintext output.
 
 ## Testing
 
-Tested on individual vaults as of Bitwarden Version 2024.2.2
+Tested on individual vaults as of Bitwarden Version 2024.8.1
 
 ### Default KDF settings
 

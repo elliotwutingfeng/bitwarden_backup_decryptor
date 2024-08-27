@@ -13,15 +13,15 @@ topics:
 publish_to: 'none'
 
 environment:
-  sdk: ^3.3.0
+  sdk: ^3.5.0
 
 dependencies:
   convert: ^3.1.1
-  hashlib: ^1.16.0
+  hashlib: ^1.19.2
   pointycastle: ^3.9.1
 
 dev_dependencies:
-  coverage: ^1.8.0
+  coverage: ^1.9.0
   lints: ^4.0.0
-  mocktail: ^1.0.3
-  test: ^1.25.5
+  mocktail: ^1.0.4
+  test: ^1.25.8
