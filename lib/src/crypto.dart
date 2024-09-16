@@ -24,7 +24,7 @@ import 'package:pointycastle/block/modes/cbc.dart';
 import 'package:pointycastle/paddings/pkcs7.dart';
 
 Uint8List hmacSHA256Digest(Uint8List key, Uint8List data) =>
-    sha256.hmac(key).convert(data).bytes;
+    sha256.hmac.by(key).convert(data).bytes;
 
 /// Reference: https://en.wikipedia.org/wiki/HKDF
 Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
@@ -55,7 +55,10 @@ Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
   const int keyLength = 32;
   late Uint8List key;
   if (kdfType == 0) {
-    key = sha256.pbkdf2(password, salt, kdfIterations, keyLength).bytes;
+    key = sha256
+        .pbkdf2(salt, iterations: kdfIterations, keyLength: keyLength)
+        .convert(password)
+        .bytes;
   } else if (kdfType == 1) {
     key = Argon2(
             version: Argon2Version.v13,
