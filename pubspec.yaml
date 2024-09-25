@@ -17,7 +17,7 @@ environment:
 
 dependencies:
   convert: ^3.1.1
-  hashlib: ^1.20.4
+  hashlib: ^1.21.0
   pointycastle: ^3.9.1
 
 dev_dependencies:
