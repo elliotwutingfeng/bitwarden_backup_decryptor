@@ -15,6 +15,17 @@ This application is not affiliated with Bitwarden, Inc.
 - **Minimum Dart SDK:** 3.5.0
 - **OS:** Either Windows, macOS, or Linux
 
+### Safety
+
+> [!CAUTION]
+> This program writes the backup file content to stdout in plaintext. By default, this means the content will be displayed on the screen.
+>
+> **Recommended precautions:**
+>
+> - Do NOT decrypt your backup file in public areas, or in the presence of untrusted persons and surveillance cameras.
+> - Do NOT decrypt your backup file on a machine that you suspect to be infected by malware.
+> - ENSURE that your terminal session output is not being unintentionally saved or recorded.
+
 ## Install dependencies
 
 ```bash
