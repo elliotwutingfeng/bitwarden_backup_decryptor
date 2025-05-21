@@ -36,7 +36,8 @@ String getPass({String prompt = ''}) {
 Map<String, dynamic> getVault(List<String> args) {
   if (args.length != 1) {
     throw ArgumentError(
-        'Usage: ${Platform.script.pathSegments.last} <filename>');
+      'Usage: ${Platform.script.pathSegments.last} <filename>',
+    );
   }
   final String filePath = args[0];
   late String vaultContent;
@@ -75,8 +76,9 @@ void _terminate(String message) {
 void main(List<String> args) {
   try {
     final Map<String, dynamic> vault = getVault(args);
-    final String passphrase =
-        getPass(prompt: 'Enter Bitwarden encrypted backup password: ');
+    final String passphrase = getPass(
+      prompt: 'Enter Bitwarden encrypted backup password: ',
+    );
     stdout.write(decryptVault(vault, passphrase));
   } on FormatException catch (e) {
     _terminate(e.message);
@@ -90,4 +92,5 @@ void main(List<String> args) {
     _terminate(e.toString());
   }
 }
+
 // coverage:ignore-end

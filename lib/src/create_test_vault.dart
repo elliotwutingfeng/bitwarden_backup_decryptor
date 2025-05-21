@@ -36,30 +36,38 @@ final String testPlainTextVault = File(testPlainTextVaultFileName)
 const Map<String, Map<String, String>> testEncryptedVaultFileName = {
   'PBKDF2': {
     'default': 'test/encrypted_test_pbkdf2.json',
-    'maximum': 'test/encrypted_test_maximum_pbkdf2.json'
+    'maximum': 'test/encrypted_test_maximum_pbkdf2.json',
   },
   'Argon2id': {
     'default': 'test/encrypted_test_argon2id.json',
-    'maximum': 'test/encrypted_test_maximum_argon2id.json'
-  }
+    'maximum': 'test/encrypted_test_maximum_argon2id.json',
+  },
 };
 final Map<String, Map<String, Map<String, dynamic>>> testEncryptedVault = {
   'PBKDF2': {
     'default': jsonDecode(
-        File(testEncryptedVaultFileName['PBKDF2']!['default']!)
-            .readAsStringSync(encoding: utf8)),
+      File(
+        testEncryptedVaultFileName['PBKDF2']!['default']!,
+      ).readAsStringSync(encoding: utf8),
+    ),
     'maximum': jsonDecode(
-        File(testEncryptedVaultFileName['PBKDF2']!['maximum']!)
-            .readAsStringSync(encoding: utf8))
+      File(
+        testEncryptedVaultFileName['PBKDF2']!['maximum']!,
+      ).readAsStringSync(encoding: utf8),
+    ),
   },
   'Argon2id': {
     'default': jsonDecode(
-        File(testEncryptedVaultFileName['Argon2id']!['default']!)
-            .readAsStringSync(encoding: utf8)),
+      File(
+        testEncryptedVaultFileName['Argon2id']!['default']!,
+      ).readAsStringSync(encoding: utf8),
+    ),
     'maximum': jsonDecode(
-        File(testEncryptedVaultFileName['Argon2id']!['maximum']!)
-            .readAsStringSync(encoding: utf8))
-  }
+      File(
+        testEncryptedVaultFileName['Argon2id']!['maximum']!,
+      ).readAsStringSync(encoding: utf8),
+    ),
+  },
 };
 
 /// KDF settings at default and at maximum levels obtained from
@@ -70,12 +78,12 @@ const Map testKdfSettings = {
     'default': {
       'kdfIterations': 600000,
       'kdfMemory': null,
-      'kdfParallelism': null
+      'kdfParallelism': null,
     },
     'maximum': {
       'kdfIterations': 2000000,
       'kdfMemory': null,
-      'kdfParallelism': null
+      'kdfParallelism': null,
     },
   },
   1: {
@@ -88,16 +96,21 @@ const Map testKdfSettings = {
 /// given an initialization vector [ivB64],
 /// an encryption key [encKey] and MAC key [macKey].
 String _encrypt(
-    String plaintext, String ivB64, Uint8List encKey, Uint8List macKey) {
+  String plaintext,
+  String ivB64,
+  Uint8List encKey,
+  Uint8List macKey,
+) {
   final Uint8List iv = base64.decode(ivB64);
   final Uint8List encodedPlaintext = Uint8List.fromList(utf8.encode(plaintext));
   final Uint8List padded = pad(encodedPlaintext, 128 ~/ 8);
   final Uint8List encryptor = aesCbc(encKey, iv, padded, true);
 
-  final Uint8List b = (BytesBuilder()
-        ..add(iv)
-        ..add(encryptor))
-      .toBytes();
+  final Uint8List b =
+      (BytesBuilder()
+            ..add(iv)
+            ..add(encryptor))
+          .toBytes();
   final Uint8List finalMac = hmacSHA256Digest(macKey, b);
 
   return '2.$ivB64|${base64.encode(encryptor)}|${base64.encode(finalMac)}';
@@ -157,7 +170,7 @@ String createTestVault(int testKdfType, String testKdfStrength) {
       'encKeyValidation_DO_NOT_EDIT': encKeyValidation,
       'data': data,
     }.entries)
-      if (entry.value != null) entry.key: entry.value
+      if (entry.value != null) entry.key: entry.value,
   });
 
   return encryptedVault;
@@ -170,4 +183,5 @@ void main(List<String> args) {
   }
   stdout.write(createTestVault(int.parse(args[0]), args[1]));
 }
+
 // coverage:ignore-end

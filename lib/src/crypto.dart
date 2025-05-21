@@ -61,23 +61,28 @@ Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
         .bytes;
   } else if (kdfType == 1) {
     key = Argon2(
-            version: Argon2Version.v13,
-            type: Argon2Type.argon2id,
-            hashLength: keyLength,
-            iterations: kdfIterations,
-            parallelism: kdfParallelism ?? 4,
-            memorySizeKB: (kdfMemory ?? 64) * 1024,
-            salt: sha256.convert(salt).bytes)
-        .convert(password)
-        .bytes;
+      version: Argon2Version.v13,
+      type: Argon2Type.argon2id,
+      hashLength: keyLength,
+      iterations: kdfIterations,
+      parallelism: kdfParallelism ?? 4,
+      memorySizeKB: (kdfMemory ?? 64) * 1024,
+      salt: sha256.convert(salt).bytes,
+    ).convert(password).bytes;
   } else {
     throw ArgumentError('Unknown KDF type');
   }
 
-  final Uint8List encKey =
-      hkdfExpand(key, Uint8List.fromList(utf8.encode('enc')), 32);
-  final Uint8List macKey =
-      hkdfExpand(key, Uint8List.fromList(utf8.encode('mac')), 32);
+  final Uint8List encKey = hkdfExpand(
+    key,
+    Uint8List.fromList(utf8.encode('enc')),
+    32,
+  );
+  final Uint8List macKey = hkdfExpand(
+    key,
+    Uint8List.fromList(utf8.encode('mac')),
+    32,
+  );
 
   return (encKey, macKey);
 }
@@ -103,7 +108,11 @@ Uint8List unpad(Uint8List bytes) {
 ///
 /// To encrypt, set [encrypt] to true. To decrypt, set [encrypt] to false.
 Uint8List aesCbc(
-    Uint8List key, Uint8List iv, Uint8List sourceText, bool encrypt) {
+  Uint8List key,
+  Uint8List iv,
+  Uint8List sourceText,
+  bool encrypt,
+) {
   if (![16, 24, 32].contains(key.length)) {
     throw ArgumentError('key.length must be 16, 24, or 32.');
   }

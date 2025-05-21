@@ -37,10 +37,11 @@ String _decrypt(String encrypted, Uint8List encKey, Uint8List macKey) {
   final Uint8List vault = base64.decode(params[1]);
   final Uint8List mac = base64.decode(params[2]);
 
-  final Uint8List b = (BytesBuilder()
-        ..add(iv)
-        ..add(vault))
-      .toBytes();
+  final Uint8List b =
+      (BytesBuilder()
+            ..add(iv)
+            ..add(vault))
+          .toBytes();
   final Uint8List finalMac = hmacSHA256Digest(macKey, b);
   if (!listEquals(mac, finalMac)) {
     throw IncorrectPasswordException('Password incorrect');
@@ -62,8 +63,11 @@ String decryptVault(Map<String, dynamic> vault, String passphrase) {
     vault['kdfParallelism'],
   );
 
-  _decrypt(vault['encKeyValidation_DO_NOT_EDIT'], encKey,
-      macKey); // throws exception if invalid
+  _decrypt(
+    vault['encKeyValidation_DO_NOT_EDIT'],
+    encKey,
+    macKey,
+  ); // throws exception if invalid
   final String plainTextVault = _decrypt(vault['data'], encKey, macKey);
   return plainTextVault;
 }

@@ -26,8 +26,9 @@ import 'package:test/test.dart';
 
 class MockStdin extends Mock implements Stdin {}
 
-final Matcher throwsIncorrectPasswordException =
-    throwsA(isA<IncorrectPasswordException>());
+final Matcher throwsIncorrectPasswordException = throwsA(
+  isA<IncorrectPasswordException>(),
+);
 
 final Matcher throwsFileSystemException = throwsA(isA<FileSystemException>());
 
@@ -38,102 +39,141 @@ void main() {
     test('Captures passphrase correctly', () {
       final MockStdin stdin = MockStdin();
 
-      when(() => stdin.readLineSync(encoding: utf8))
-          .thenReturn(ctv.testPassphrase);
+      when(
+        () => stdin.readLineSync(encoding: utf8),
+      ).thenReturn(ctv.testPassphrase);
       when(() => stdin.echoMode).thenReturn(false);
 
-      IOOverrides.runZoned(
-        () {
-          expect(getPass(), ctv.testPassphrase);
-        },
-        stdin: () => stdin,
-      );
+      IOOverrides.runZoned(() {
+        expect(getPass(), ctv.testPassphrase);
+      }, stdin: () => stdin);
     });
   }, timeout: Timeout(Duration(seconds: 30)));
 
   group('getVault', () {
     test('Parses vault correctly', () {
-      expect(getVault([ctv.testEncryptedVaultFileName['PBKDF2']!['default']!]),
-          ctv.testEncryptedVault['PBKDF2']!['default']!);
+      expect(
+        getVault([ctv.testEncryptedVaultFileName['PBKDF2']!['default']!]),
+        ctv.testEncryptedVault['PBKDF2']!['default']!,
+      );
       expect(() => getVault([]), throwsArgumentError); // args too short
       expect(
-          () => getVault([
-                ctv.testEncryptedVaultFileName['PBKDF2']!['default']!,
-                ctv.testEncryptedVaultFileName['PBKDF2']!['default']!
-              ]),
-          throwsArgumentError); // args too long
+        () => getVault([
+          ctv.testEncryptedVaultFileName['PBKDF2']!['default']!,
+          ctv.testEncryptedVaultFileName['PBKDF2']!['default']!,
+        ]),
+        throwsArgumentError,
+      ); // args too long
     });
     test('Rejects invalid file path', () {
       expect(() => getVault(['']), throwsFileSystemException);
     });
     test('Rejects invalid JSON file', () {
-      expect(() => getVault(['test/bitwarden_backup_decryptor_test.dart']),
-          throwsFormatException);
+      expect(
+        () => getVault(['test/bitwarden_backup_decryptor_test.dart']),
+        throwsFormatException,
+      );
     });
   }, timeout: Timeout(Duration(seconds: 30)));
 
   group('decryptVault', () {
     for (final String strength in ['default', 'maximum']) {
-      test('Correct password -> Decryption success | KDF settings: $strength',
-          () {
-        expect(
-            decryptVault(ctv.testEncryptedVault['PBKDF2']![strength]!,
-                ctv.testPassphrase),
-            ctv.testPlainTextVault);
-        expect(
-            decryptVault(ctv.testEncryptedVault['Argon2id']![strength]!,
-                ctv.testPassphrase),
-            ctv.testPlainTextVault);
-      }, tags: strength);
+      test(
+        'Correct password -> Decryption success | KDF settings: $strength',
+        () {
+          expect(
+            decryptVault(
+              ctv.testEncryptedVault['PBKDF2']![strength]!,
+              ctv.testPassphrase,
+            ),
+            ctv.testPlainTextVault,
+          );
+          expect(
+            decryptVault(
+              ctv.testEncryptedVault['Argon2id']![strength]!,
+              ctv.testPassphrase,
+            ),
+            ctv.testPlainTextVault,
+          );
+        },
+        tags: strength,
+      );
 
-      test('Wrong password -> Decryption failure | KDF settings: $strength',
-          () {
-        for (final String wrongPassphrase in ['', '${ctv.testPassphrase}A']) {
-          expect(
-              () => decryptVault(ctv.testEncryptedVault['PBKDF2']![strength]!,
-                  wrongPassphrase),
-              throwsIncorrectPasswordException);
-          expect(
-              () => decryptVault(ctv.testEncryptedVault['Argon2id']![strength]!,
-                  wrongPassphrase),
-              throwsIncorrectPasswordException);
-        }
-      }, tags: strength);
+      test(
+        'Wrong password -> Decryption failure | KDF settings: $strength',
+        () {
+          for (final String wrongPassphrase in ['', '${ctv.testPassphrase}A']) {
+            expect(
+              () => decryptVault(
+                ctv.testEncryptedVault['PBKDF2']![strength]!,
+                wrongPassphrase,
+              ),
+              throwsIncorrectPasswordException,
+            );
+            expect(
+              () => decryptVault(
+                ctv.testEncryptedVault['Argon2id']![strength]!,
+                wrongPassphrase,
+              ),
+              throwsIncorrectPasswordException,
+            );
+          }
+        },
+        tags: strength,
+      );
     }
     test('Wrong vault format -> Decryption failure', () {
       expect(() => decryptVault(jsonDecode(''), ''), throwsFormatException);
       expect(
-          () => decryptVault(
-              jsonDecode('{"salt":"","kdfType":1,"kdfIterations":1,'
-                  '"kdfMemory":1,"kdfParallelism":1,'
-                  '"encKeyValidation_DO_NOT_EDIT":""}'),
-              ''),
-          throwsFormatException);
+        () => decryptVault(
+          jsonDecode(
+            '{"salt":"","kdfType":1,"kdfIterations":1,'
+            '"kdfMemory":1,"kdfParallelism":1,'
+            '"encKeyValidation_DO_NOT_EDIT":""}',
+          ),
+          '',
+        ),
+        throwsFormatException,
+      );
       expect(
-          () => decryptVault(
-              jsonDecode('{"salt":null,"kdfType":null,"kdfIterations":null,'
-                  '"kdfMemory":null,"kdfParallelism":null}'),
-              ''),
-          throwsTypeError);
+        () => decryptVault(
+          jsonDecode(
+            '{"salt":null,"kdfType":null,"kdfIterations":null,'
+            '"kdfMemory":null,"kdfParallelism":null}',
+          ),
+          '',
+        ),
+        throwsTypeError,
+      );
       expect(
-          () => decryptVault(
-              jsonDecode('{"salt":"","kdfType":999,"kdfIterations":1,'
-                  '"kdfMemory":1,"kdfParallelism":1}'),
-              ''),
-          throwsArgumentError);
+        () => decryptVault(
+          jsonDecode(
+            '{"salt":"","kdfType":999,"kdfIterations":1,'
+            '"kdfMemory":1,"kdfParallelism":1}',
+          ),
+          '',
+        ),
+        throwsArgumentError,
+      );
     });
   }, timeout: Timeout(Duration(minutes: 15)));
 
   group('createTestVault', () {
     for (final String strength in ['default', 'maximum']) {
       test('Encrypts correctly | KDF settings: $strength', () {
-        expect(jsonDecode(ctv.createTestVault(0, strength)),
-            ctv.testEncryptedVault['PBKDF2']![strength]!);
-        expect(jsonDecode(ctv.createTestVault(1, strength)),
-            ctv.testEncryptedVault['Argon2id']![strength]!);
+        expect(
+          jsonDecode(ctv.createTestVault(0, strength)),
+          ctv.testEncryptedVault['PBKDF2']![strength]!,
+        );
+        expect(
+          jsonDecode(ctv.createTestVault(1, strength)),
+          ctv.testEncryptedVault['Argon2id']![strength]!,
+        );
 
         expect(
-            () => ctv.createTestVault(1, 'notAStrength'), throwsArgumentError);
+          () => ctv.createTestVault(1, 'notAStrength'),
+          throwsArgumentError,
+        );
         expect(() => ctv.createTestVault(2, strength), throwsArgumentError);
       }, tags: strength);
     }
@@ -141,14 +181,22 @@ void main() {
 
   group('aesCbc', () {
     test('Reject arguments with invalid lengths', () {
-      expect(() => aesCbc(Uint8List(0), Uint8List(0), Uint8List(0), true),
-          throwsArgumentError);
-      expect(() => aesCbc(Uint8List(16), Uint8List(0), Uint8List(0), true),
-          throwsArgumentError);
-      expect(() => aesCbc(Uint8List(16), Uint8List(16), Uint8List(17), true),
-          throwsArgumentError);
-      expect(aesCbc(Uint8List(16), Uint8List(16), Uint8List(16), true),
-          base64Url.decode('ZulL1O-KLDuITPpZyjQrLg=='));
+      expect(
+        () => aesCbc(Uint8List(0), Uint8List(0), Uint8List(0), true),
+        throwsArgumentError,
+      );
+      expect(
+        () => aesCbc(Uint8List(16), Uint8List(0), Uint8List(0), true),
+        throwsArgumentError,
+      );
+      expect(
+        () => aesCbc(Uint8List(16), Uint8List(16), Uint8List(17), true),
+        throwsArgumentError,
+      );
+      expect(
+        aesCbc(Uint8List(16), Uint8List(16), Uint8List(16), true),
+        base64Url.decode('ZulL1O-KLDuITPpZyjQrLg=='),
+      );
     });
   }, timeout: Timeout(Duration(seconds: 30)));
 }
