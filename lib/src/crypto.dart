@@ -23,11 +23,15 @@ import 'package:pointycastle/block/aes.dart';
 import 'package:pointycastle/block/modes/cbc.dart';
 import 'package:pointycastle/paddings/pkcs7.dart';
 
-Uint8List hmacSHA256Digest(Uint8List key, Uint8List data) =>
+Uint8List hmacSHA256Digest(final Uint8List key, final Uint8List data) =>
     sha256.hmac.by(key).convert(data).bytes;
 
 /// Reference: https://en.wikipedia.org/wiki/HKDF
-Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
+Uint8List hkdfExpand(
+  final Uint8List key,
+  final Uint8List info,
+  final int length,
+) {
   Uint8List t = Uint8List(0);
   Uint8List okm = Uint8List(0);
   int i = 0;
@@ -43,12 +47,12 @@ Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
 }
 
 (Uint8List encKey, Uint8List macKey) getEncAndMacKeys(
-  String passphrase,
-  String passphraseSalt,
-  int kdfType,
-  int kdfIterations,
-  int? kdfMemory,
-  int? kdfParallelism,
+  final String passphrase,
+  final String passphraseSalt,
+  final int kdfType,
+  final int kdfIterations,
+  final int? kdfMemory,
+  final int? kdfParallelism,
 ) {
   final Uint8List password = Uint8List.fromList(utf8.encode(passphrase));
   final Uint8List salt = Uint8List.fromList(utf8.encode(passphraseSalt));
@@ -88,7 +92,7 @@ Uint8List hkdfExpand(Uint8List key, Uint8List info, int length) {
 }
 
 /// PKCS7 padding before AES-CBC encryption.
-Uint8List pad(Uint8List bytes, int blockSizeBytes) {
+Uint8List pad(final Uint8List bytes, final int blockSizeBytes) {
   final int padLength = blockSizeBytes - (bytes.length % blockSizeBytes);
   final Uint8List padded = Uint8List(bytes.length + padLength)
     ..setAll(0, bytes);
@@ -97,7 +101,7 @@ Uint8List pad(Uint8List bytes, int blockSizeBytes) {
 }
 
 /// PKCS7 unpadding after AES-CBC decryption.
-Uint8List unpad(Uint8List bytes) {
+Uint8List unpad(final Uint8List bytes) {
   final int padLength = (PKCS7Padding()..init(null)).padCount(bytes);
   final int len = bytes.length - padLength;
   return Uint8List(len)..setRange(0, len, bytes);
@@ -108,10 +112,10 @@ Uint8List unpad(Uint8List bytes) {
 ///
 /// To encrypt, set [encrypt] to true. To decrypt, set [encrypt] to false.
 Uint8List aesCbc(
-  Uint8List key,
-  Uint8List iv,
-  Uint8List sourceText,
-  bool encrypt,
+  final Uint8List key,
+  final Uint8List iv,
+  final Uint8List sourceText,
+  final bool encrypt,
 ) {
   if (![16, 24, 32].contains(key.length)) {
     throw ArgumentError('key.length must be 16, 24, or 32.');
@@ -141,7 +145,7 @@ Uint8List aesCbc(
 }
 
 /// Compare 2 lists element-by-element in constant-time.
-bool listEquals(List<dynamic> list1, List<dynamic> list2) {
+bool listEquals(final List<dynamic> list1, final List<dynamic> list2) {
   if (list1.length != list2.length) return false;
   int mismatch = 0;
   for (int i = 0; i < list1.length; i++) {

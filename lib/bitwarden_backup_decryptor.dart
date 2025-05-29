@@ -22,7 +22,7 @@ import 'package:bitwarden_backup_decryptor/src/decrypt_vault.dart';
 export 'package:bitwarden_backup_decryptor/src/decrypt_vault.dart';
 
 /// Prompt user for password.
-String getPass({String prompt = ''}) {
+String getPass({final String prompt = ''}) {
   stderr.write(prompt);
   final bool echoMode = stdin.echoMode;
   stdin.echoMode = false;
@@ -33,7 +33,7 @@ String getPass({String prompt = ''}) {
 }
 
 /// Read encrypted vault content from user prompt.
-Map<String, dynamic> getVault(List<String> args) {
+Map<String, dynamic> getVault(final List<String> args) {
   if (args.length != 1) {
     throw ArgumentError(
       'Usage: ${Platform.script.pathSegments.last} <filename>',
@@ -68,12 +68,12 @@ Map<String, dynamic> getVault(List<String> args) {
 }
 
 // coverage:ignore-start
-void _terminate(String message) {
+void _terminate(final String message) {
   stderr.writeln(message);
   exit(1);
 }
 
-void main(List<String> args) {
+void main(final List<String> args) {
   try {
     final Map<String, dynamic> vault = getVault(args);
     final String passphrase = getPass(

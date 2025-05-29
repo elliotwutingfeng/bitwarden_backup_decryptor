@@ -26,7 +26,11 @@ class IncorrectPasswordException implements Exception {
 
 /// Decrypt a Bitwarden [encrypted] string, given an encryption key [encKey] and
 /// MAC key [macKey].
-String _decrypt(String encrypted, Uint8List encKey, Uint8List macKey) {
+String _decrypt(
+  final String encrypted,
+  final Uint8List encKey,
+  final Uint8List macKey,
+) {
   final List<String> params = encrypted.split('|');
   if (params.length != 3 ||
       params[0].length < 3 ||
@@ -53,7 +57,7 @@ String _decrypt(String encrypted, Uint8List encKey, Uint8List macKey) {
 }
 
 /// Decrypt [vault] with [passphrase] and return result as plaintext.
-String decryptVault(Map<String, dynamic> vault, String passphrase) {
+String decryptVault(final Map<String, dynamic> vault, final String passphrase) {
   final (Uint8List encKey, Uint8List macKey) = getEncAndMacKeys(
     passphrase,
     vault['salt'],

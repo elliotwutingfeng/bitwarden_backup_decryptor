@@ -96,10 +96,10 @@ const Map testKdfSettings = {
 /// given an initialization vector [ivB64],
 /// an encryption key [encKey] and MAC key [macKey].
 String _encrypt(
-  String plaintext,
-  String ivB64,
-  Uint8List encKey,
-  Uint8List macKey,
+  final String plaintext,
+  final String ivB64,
+  final Uint8List encKey,
+  final Uint8List macKey,
 ) {
   final Uint8List iv = base64.decode(ivB64);
   final Uint8List encodedPlaintext = Uint8List.fromList(utf8.encode(plaintext));
@@ -122,7 +122,7 @@ String _encrypt(
 /// testKdfType 0 -> PBKDF2
 ///
 /// testKdfType 1 -> Argon2id
-String createTestVault(int testKdfType, String testKdfStrength) {
+String createTestVault(final int testKdfType, final String testKdfStrength) {
   if (testKdfType != 0 && testKdfType != 1) {
     throw ArgumentError('`kdfType` must be 0 or 1');
   }
@@ -177,7 +177,7 @@ String createTestVault(int testKdfType, String testKdfStrength) {
 }
 
 // coverage:ignore-start
-void main(List<String> args) {
+void main(final List<String> args) {
   if (args.length != 2) {
     throw ArgumentError('Number of arguments must be 2.');
   }
