@@ -7,6 +7,10 @@
 #
 # A fast CPU (at least 8 cores) is also highly recommended.
 
+format:
+	dart fix --apply
+	dart format .
+
 generate_test_files:
 	dart run lib/src/create_test_vault.dart 0 default > test/encrypted_test_pbkdf2.json
 	dart run lib/src/create_test_vault.dart 0 maximum > test/encrypted_test_maximum_pbkdf2.json
