@@ -29,9 +29,9 @@ const String testVaultSalt = 'ZWJYgGWulXafn/ABTx/Cuw==';
 /// Sample vault JSON retrieved from
 /// https://bitwarden.com/help/condition-bitwarden-import/#condition-a-json
 const String testPlainTextVaultFileName = 'test/individual.json';
-final String testPlainTextVault = File(testPlainTextVaultFileName)
-    .readAsStringSync(encoding: utf8)
-    .replaceAll('\r\n', '\n'); // Windows compatibility
+final String testPlainTextVault = File(
+  testPlainTextVaultFileName,
+).readAsStringSync().replaceAll('\r\n', '\n'); // Windows compatibility
 
 const Map<String, Map<String, String>> testEncryptedVaultFileName = {
   'PBKDF2': {
@@ -43,29 +43,29 @@ const Map<String, Map<String, String>> testEncryptedVaultFileName = {
     'maximum': 'test/encrypted_test_maximum_argon2id.json',
   },
 };
-final Map<String, Map<String, Map<String, dynamic>>> testEncryptedVault = {
+final Map<String, Map<String, dynamic>> testEncryptedVault = {
   'PBKDF2': {
     'default': jsonDecode(
       File(
         testEncryptedVaultFileName['PBKDF2']!['default']!,
-      ).readAsStringSync(encoding: utf8),
+      ).readAsStringSync(),
     ),
     'maximum': jsonDecode(
       File(
         testEncryptedVaultFileName['PBKDF2']!['maximum']!,
-      ).readAsStringSync(encoding: utf8),
+      ).readAsStringSync(),
     ),
   },
   'Argon2id': {
     'default': jsonDecode(
       File(
         testEncryptedVaultFileName['Argon2id']!['default']!,
-      ).readAsStringSync(encoding: utf8),
+      ).readAsStringSync(),
     ),
     'maximum': jsonDecode(
       File(
         testEncryptedVaultFileName['Argon2id']!['maximum']!,
-      ).readAsStringSync(encoding: utf8),
+      ).readAsStringSync(),
     ),
   },
 };
@@ -73,7 +73,7 @@ final Map<String, Map<String, Map<String, dynamic>>> testEncryptedVault = {
 /// KDF settings at default and at maximum levels obtained from
 /// https://github.com/bitwarden/server/blob/main/src/Core/Constants.cs
 /// under public static class `AuthConstants`.
-const Map testKdfSettings = {
+const Map<dynamic, dynamic> testKdfSettings = {
   0: {
     'default': {
       'kdfIterations': 600000,
@@ -130,10 +130,11 @@ String createTestVault(final int testKdfType, final String testKdfStrength) {
     throw ArgumentError('`kdfStrength` must be default or maximum');
   }
 
-  final Map settings = testKdfSettings[testKdfType][testKdfStrength];
-  final int testKdfIterations = settings['kdfIterations'];
-  final int? testKdfMemory = settings['kdfMemory'];
-  final int? testKdfParallelism = settings['kdfParallelism'];
+  final Map<dynamic, dynamic> settings =
+      testKdfSettings[testKdfType][testKdfStrength] as Map;
+  final int testKdfIterations = settings['kdfIterations'] as int;
+  final int? testKdfMemory = settings['kdfMemory'] as int?;
+  final int? testKdfParallelism = settings['kdfParallelism'] as int?;
 
   final (Uint8List encKey, Uint8List macKey) = getEncAndMacKeys(
     testPassphrase,
@@ -159,7 +160,7 @@ String createTestVault(final int testKdfType, final String testKdfStrength) {
   );
 
   final String encryptedVault = JsonEncoder.withIndent('  ').convert({
-    for (final MapEntry entry in {
+    for (final MapEntry<dynamic, dynamic> entry in {
       'encrypted': true,
       'passwordProtected': true,
       'salt': testPassphraseSalt,

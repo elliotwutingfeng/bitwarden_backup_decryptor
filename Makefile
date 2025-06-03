@@ -20,13 +20,13 @@ generate_test_files:
 tests_default:
 	dart pub get
 	dart format --output none --set-exit-if-changed .
-	dart analyze
+	dart analyze --fatal-infos
 	dart test --exclude-tags maximum --coverage "coverage"
 	dart run coverage:format_coverage --lcov --check-ignore --in coverage --out coverage.lcov --report-on lib
 
 tests_maximum:
 	dart pub get
 	dart format --output none --set-exit-if-changed .
-	dart analyze
+	dart analyze --fatal-infos
 	dart test --exclude-tags default --coverage "coverage"
 	dart run coverage:format_coverage --lcov --check-ignore --in coverage --out coverage.lcov --report-on lib

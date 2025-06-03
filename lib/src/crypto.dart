@@ -65,8 +65,6 @@ Uint8List hkdfExpand(
         .bytes;
   } else if (kdfType == 1) {
     key = Argon2(
-      version: Argon2Version.v13,
-      type: Argon2Type.argon2id,
       hashLength: keyLength,
       iterations: kdfIterations,
       parallelism: kdfParallelism ?? 4,
@@ -102,7 +100,7 @@ Uint8List pad(final Uint8List bytes, final int blockSizeBytes) {
 
 /// PKCS7 unpadding after AES-CBC decryption.
 Uint8List unpad(final Uint8List bytes) {
-  final int padLength = (PKCS7Padding()..init(null)).padCount(bytes);
+  final int padLength = (PKCS7Padding()..init()).padCount(bytes);
   final int len = bytes.length - padLength;
   return Uint8List(len)..setRange(0, len, bytes);
 }
@@ -144,8 +142,8 @@ Uint8List aesCbc(
   return targetText;
 }
 
-/// Compare 2 lists element-by-element in constant-time.
-bool listEquals(final List<dynamic> list1, final List<dynamic> list2) {
+/// Compare 2 lists of integers element-by-element in constant-time.
+bool listEquals(final List<int> list1, final List<int> list2) {
   if (list1.length != list2.length) return false;
   int mismatch = 0;
   for (int i = 0; i < list1.length; i++) {

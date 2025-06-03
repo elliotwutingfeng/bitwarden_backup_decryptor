@@ -60,18 +60,22 @@ String _decrypt(
 String decryptVault(final Map<String, dynamic> vault, final String passphrase) {
   final (Uint8List encKey, Uint8List macKey) = getEncAndMacKeys(
     passphrase,
-    vault['salt'],
-    vault['kdfType'],
-    vault['kdfIterations'],
-    vault['kdfMemory'],
-    vault['kdfParallelism'],
+    vault['salt'] as String,
+    vault['kdfType'] as int,
+    vault['kdfIterations'] as int,
+    vault['kdfMemory'] as int?,
+    vault['kdfParallelism'] as int?,
   );
 
   _decrypt(
-    vault['encKeyValidation_DO_NOT_EDIT'],
+    vault['encKeyValidation_DO_NOT_EDIT'] as String,
     encKey,
     macKey,
   ); // throws exception if invalid
-  final String plainTextVault = _decrypt(vault['data'], encKey, macKey);
+  final String plainTextVault = _decrypt(
+    vault['data'] as String,
+    encKey,
+    macKey,
+  );
   return plainTextVault;
 }

@@ -83,14 +83,16 @@ void main() {
         () {
           expect(
             decryptVault(
-              ctv.testEncryptedVault['PBKDF2']![strength]!,
+              ctv.testEncryptedVault['PBKDF2']![strength]
+                  as Map<String, dynamic>,
               ctv.testPassphrase,
             ),
             ctv.testPlainTextVault,
           );
           expect(
             decryptVault(
-              ctv.testEncryptedVault['Argon2id']![strength]!,
+              ctv.testEncryptedVault['Argon2id']![strength]
+                  as Map<String, dynamic>,
               ctv.testPassphrase,
             ),
             ctv.testPlainTextVault,
@@ -105,14 +107,16 @@ void main() {
           for (final String wrongPassphrase in ['', '${ctv.testPassphrase}A']) {
             expect(
               () => decryptVault(
-                ctv.testEncryptedVault['PBKDF2']![strength]!,
+                ctv.testEncryptedVault['PBKDF2']![strength]
+                    as Map<String, dynamic>,
                 wrongPassphrase,
               ),
               throwsIncorrectPasswordException,
             );
             expect(
               () => decryptVault(
-                ctv.testEncryptedVault['Argon2id']![strength]!,
+                ctv.testEncryptedVault['Argon2id']![strength]
+                    as Map<String, dynamic>,
                 wrongPassphrase,
               ),
               throwsIncorrectPasswordException,
@@ -123,14 +127,18 @@ void main() {
       );
     }
     test('Wrong vault format -> Decryption failure', () {
-      expect(() => decryptVault(jsonDecode(''), ''), throwsFormatException);
+      expect(
+        () => decryptVault(jsonDecode('') as Map<String, dynamic>, ''),
+        throwsFormatException,
+      );
       expect(
         () => decryptVault(
           jsonDecode(
-            '{"salt":"","kdfType":1,"kdfIterations":1,'
-            '"kdfMemory":1,"kdfParallelism":1,'
-            '"encKeyValidation_DO_NOT_EDIT":""}',
-          ),
+                '{"salt":"","kdfType":1,"kdfIterations":1,'
+                '"kdfMemory":1,"kdfParallelism":1,'
+                '"encKeyValidation_DO_NOT_EDIT":""}',
+              )
+              as Map<String, dynamic>,
           '',
         ),
         throwsFormatException,
@@ -138,9 +146,10 @@ void main() {
       expect(
         () => decryptVault(
           jsonDecode(
-            '{"salt":null,"kdfType":null,"kdfIterations":null,'
-            '"kdfMemory":null,"kdfParallelism":null}',
-          ),
+                '{"salt":null,"kdfType":null,"kdfIterations":null,'
+                '"kdfMemory":null,"kdfParallelism":null}',
+              )
+              as Map<String, dynamic>,
           '',
         ),
         throwsTypeError,
@@ -148,9 +157,10 @@ void main() {
       expect(
         () => decryptVault(
           jsonDecode(
-            '{"salt":"","kdfType":999,"kdfIterations":1,'
-            '"kdfMemory":1,"kdfParallelism":1}',
-          ),
+                '{"salt":"","kdfType":999,"kdfIterations":1,'
+                '"kdfMemory":1,"kdfParallelism":1}',
+              )
+              as Map<String, dynamic>,
           '',
         ),
         throwsArgumentError,

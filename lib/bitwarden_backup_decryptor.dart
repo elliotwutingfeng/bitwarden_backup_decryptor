@@ -42,27 +42,28 @@ Map<String, dynamic> getVault(final List<String> args) {
   final String filePath = args[0];
   late String vaultContent;
   try {
-    vaultContent = File(filePath).readAsStringSync(encoding: utf8);
+    vaultContent = File(filePath).readAsStringSync();
   } on FileSystemException catch (e) {
     throw FileSystemException('${e.message}: ${e.path}');
   }
   late Map<String, dynamic> vault;
   try {
-    vault = jsonDecode(vaultContent);
+    vault = jsonDecode(vaultContent) as Map<String, dynamic>;
   } on FormatException {
     throw FormatException('Failed to parse JSON file. Invalid JSON?');
   }
   final String passphraseSalt = // ignore: unused_local_variable
-      vault['salt'];
-  final int kdfType = vault['kdfType']; // ignore: unused_local_variable
+      vault['salt'] as String;
+  final int kdfType = vault['kdfType'] as int; // ignore: unused_local_variable
   final int kdfIterations = // ignore: unused_local_variable
-      vault['kdfIterations'];
-  final int? kdfMemory = vault['kdfMemory']; // ignore: unused_local_variable
+      vault['kdfIterations'] as int;
+  final int? kdfMemory = // ignore: unused_local_variable
+      vault['kdfMemory'] as int?;
   final int? kdfParallelism = // ignore: unused_local_variable
-      vault['kdfParallelism'];
+      vault['kdfParallelism'] as int?;
   final String encKeyValidation = // ignore: unused_local_variable
-      vault['encKeyValidation_DO_NOT_EDIT'];
-  final String data = vault['data']; // ignore: unused_local_variable
+      vault['encKeyValidation_DO_NOT_EDIT'] as String;
+  final String data = vault['data'] as String; // ignore: unused_local_variable
 
   return vault;
 }
@@ -87,7 +88,7 @@ void main(final List<String> args) {
   } on FileSystemException catch (e) {
     _terminate(e.message);
   } on ArgumentError catch (e) {
-    _terminate(e.message);
+    _terminate(e.message as String);
   } on TypeError catch (e) {
     _terminate(e.toString());
   }
