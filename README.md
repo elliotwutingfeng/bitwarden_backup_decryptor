@@ -231,27 +231,8 @@ Tested on individual vaults as of Bitwarden Version 2024.8.1
 
 ### Default KDF settings
 
-Either run
-
 ```bash
 make tests_default
-```
-
-or
-
-```bash
-# Install dependencies
-dart pub get
-
-# Run tests using default KDF settings and compute test coverage
-dart test --exclude-tags maximum --coverage "coverage"
-
-# Generate `.lcov` report from `coverage` folder
-dart run coverage:format_coverage --lcov --check-ignore --in coverage --out coverage.lcov --report-on lib
-
-# Generate HTML code coverage report from `.lcov` report
-# Note: On macOS/Linux you need to have `lcov` installed on your system
-genhtml coverage.lcov -o coverage/html
 ```
 
 ### Maximum KDF settings
