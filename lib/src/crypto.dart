@@ -38,11 +38,15 @@ Uint8List hkdfExpand(
 
   while (okm.length < length) {
     i++;
-    final Uint8List input = Uint8List.fromList([...t, ...info, i]);
+    final Uint8List input = Uint8List(t.length + info.length + 1)
+      ..setAll(0, t)
+      ..setAll(t.length, info)
+      ..setAll(t.length + info.length, [i]);
     t = hmacSHA256Digest(key, input);
-    okm = Uint8List.fromList([...okm, ...t]);
+    okm = Uint8List(okm.length + t.length)
+      ..setAll(0, okm)
+      ..setAll(okm.length, t);
   }
-
   return okm.sublist(0, length);
 }
 
@@ -54,8 +58,8 @@ Uint8List hkdfExpand(
   final int? kdfMemory,
   final int? kdfParallelism,
 ) {
-  final Uint8List password = Uint8List.fromList(utf8.encode(passphrase));
-  final Uint8List salt = Uint8List.fromList(utf8.encode(passphraseSalt));
+  final Uint8List password = utf8.encode(passphrase);
+  final Uint8List salt = utf8.encode(passphraseSalt);
   const int keyLength = 32;
   late Uint8List key;
   if (kdfType == 0) {
@@ -75,16 +79,8 @@ Uint8List hkdfExpand(
     throw ArgumentError('Unknown KDF type');
   }
 
-  final Uint8List encKey = hkdfExpand(
-    key,
-    Uint8List.fromList(utf8.encode('enc')),
-    32,
-  );
-  final Uint8List macKey = hkdfExpand(
-    key,
-    Uint8List.fromList(utf8.encode('mac')),
-    32,
-  );
+  final Uint8List encKey = hkdfExpand(key, utf8.encode('enc'), 32);
+  final Uint8List macKey = hkdfExpand(key, utf8.encode('mac'), 32);
 
   return (encKey, macKey);
 }

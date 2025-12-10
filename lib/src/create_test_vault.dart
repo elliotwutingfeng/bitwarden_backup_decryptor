@@ -102,7 +102,7 @@ String _encrypt(
   final Uint8List macKey,
 ) {
   final Uint8List iv = base64.decode(ivB64);
-  final Uint8List encodedPlaintext = Uint8List.fromList(utf8.encode(plaintext));
+  final Uint8List encodedPlaintext = utf8.encode(plaintext);
   final Uint8List padded = pad(encodedPlaintext, 128 ~/ 8);
   final Uint8List encryptor = aesCbc(encKey, iv, padded, true);
 
