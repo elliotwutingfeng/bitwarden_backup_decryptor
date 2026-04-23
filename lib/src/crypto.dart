@@ -17,11 +17,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:hashlib/hashlib.dart';
-import 'package:pointycastle/api.dart';
-import 'package:pointycastle/block/aes.dart';
-import 'package:pointycastle/block/modes/cbc.dart';
-import 'package:pointycastle/paddings/pkcs7.dart';
+import 'package:cipherlib/cipherlib.dart';
+import 'package:cipherlib/hashlib.dart';
 
 Uint8List hmacSHA256Digest(final Uint8List key, final Uint8List data) =>
     sha256.hmac.by(key).convert(data).bytes;
@@ -90,16 +87,13 @@ Uint8List pad(final Uint8List bytes, final int blockSizeBytes) {
   final int padLength = blockSizeBytes - (bytes.length % blockSizeBytes);
   final Uint8List padded = Uint8List(bytes.length + padLength)
     ..setAll(0, bytes);
-  PKCS7Padding().addPadding(padded, bytes.length);
+  Padding.pkcs7.pad(padded, bytes.length);
   return padded;
 }
 
 /// PKCS7 unpadding after AES-CBC decryption.
-Uint8List unpad(final Uint8List bytes) {
-  final int padLength = (PKCS7Padding()..init()).padCount(bytes);
-  final int len = bytes.length - padLength;
-  return Uint8List(len)..setRange(0, len, bytes);
-}
+Uint8List unpad(final Uint8List bytes) =>
+    Padding.pkcs7.unpad(bytes, bytes.length);
 
 /// Encrypts/Decrypts [sourceText] with symmetric [key] and initialization
 /// vector [iv].
@@ -111,31 +105,8 @@ Uint8List aesCbc(
   final Uint8List sourceText,
   final bool encrypt,
 ) {
-  if (![16, 24, 32].contains(key.length)) {
-    throw ArgumentError('key.length must be 16, 24, or 32.');
-  }
-  if (iv.length != 16) {
-    throw ArgumentError('iv.length must be 16.');
-  }
-  if (sourceText.length % 16 != 0) {
-    throw ArgumentError('sourceText.length must be a multiple of 16.');
-  }
-  final CBCBlockCipher cbc = CBCBlockCipher(AESEngine())
-    ..init(encrypt, ParametersWithIV(KeyParameter(key), iv));
-
-  final Uint8List targetText = Uint8List(sourceText.length);
-
-  int offset = 0;
-  while (offset < sourceText.length) {
-    offset += cbc.processBlock(sourceText, offset, targetText, offset);
-  }
-  // coverage:ignore-start
-  if (sourceText.length != offset) {
-    throw ArgumentError('sourceText.length must be equal to offset.');
-  }
-  // coverage:ignore-end
-
-  return targetText;
+  final AESInCBCMode cbc = AES(key, Padding.none).cbc(iv);
+  return encrypt ? cbc.encrypt(sourceText) : cbc.decrypt(sourceText);
 }
 
 /// Compare 2 lists of integers element-by-element in constant-time.

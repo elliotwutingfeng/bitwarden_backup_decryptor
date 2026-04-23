@@ -192,16 +192,16 @@ void main() {
   group('aesCbc', () {
     test('Reject arguments with invalid lengths', () {
       expect(
-        () => aesCbc(Uint8List(0), Uint8List(0), Uint8List(0), true),
-        throwsArgumentError,
+        () => aesCbc(Uint8List(0), Uint8List(16), Uint8List(16), true),
+        throwsStateError,
       );
       expect(
-        () => aesCbc(Uint8List(16), Uint8List(0), Uint8List(0), true),
-        throwsArgumentError,
+        () => aesCbc(Uint8List(16), Uint8List(0), Uint8List(16), true),
+        throwsStateError,
       );
       expect(
         () => aesCbc(Uint8List(16), Uint8List(16), Uint8List(17), true),
-        throwsArgumentError,
+        throwsStateError,
       );
       expect(
         aesCbc(Uint8List(16), Uint8List(16), Uint8List(16), true),
