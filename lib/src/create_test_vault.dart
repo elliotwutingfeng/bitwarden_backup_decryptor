@@ -19,6 +19,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:bitwarden_backup_decryptor/src/crypto.dart';
+import 'package:cipherlib/codecs.dart';
 
 const String testPassphrase = 'passphrase';
 const String testPassphraseSalt = 'rNYWSe/wFO1k+Qxia0A96A==';
@@ -101,8 +102,8 @@ String _encrypt(
   final Uint8List encKey,
   final Uint8List macKey,
 ) {
-  final Uint8List iv = base64.decode(ivB64);
-  final Uint8List encodedPlaintext = utf8.encode(plaintext);
+  final Uint8List iv = fromBase64(ivB64);
+  final Uint8List encodedPlaintext = toUtf8(plaintext);
   final Uint8List padded = pad(encodedPlaintext, 128 ~/ 8);
   final Uint8List encryptor = aesCbc(encKey, iv, padded, true);
 
@@ -113,7 +114,7 @@ String _encrypt(
           .toBytes();
   final Uint8List finalMac = hmacSHA256Digest(macKey, b);
 
-  return '2.$ivB64|${base64.encode(encryptor)}|${base64.encode(finalMac)}';
+  return '2.$ivB64|${toBase64(encryptor)}|${toBase64(finalMac)}';
 }
 
 /// Create an encrypted cyphertext vault of KDF type [testKdfType] and

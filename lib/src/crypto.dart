@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:cipherlib/cipherlib.dart';
+import 'package:cipherlib/codecs.dart';
 import 'package:cipherlib/hashlib.dart';
 
 Uint8List hmacSHA256Digest(final Uint8List key, final Uint8List data) =>
@@ -55,8 +55,8 @@ Uint8List hkdfExpand(
   final int? kdfMemory,
   final int? kdfParallelism,
 ) {
-  final Uint8List password = utf8.encode(passphrase);
-  final Uint8List salt = utf8.encode(passphraseSalt);
+  final Uint8List password = toUtf8(passphrase);
+  final Uint8List salt = toUtf8(passphraseSalt);
   const int keyLength = 32;
   late Uint8List key;
   if (kdfType == 0) {
@@ -76,8 +76,8 @@ Uint8List hkdfExpand(
     throw ArgumentError('Unknown KDF type');
   }
 
-  final Uint8List encKey = hkdfExpand(key, utf8.encode('enc'), 32);
-  final Uint8List macKey = hkdfExpand(key, utf8.encode('mac'), 32);
+  final Uint8List encKey = hkdfExpand(key, toUtf8('enc'), 32);
+  final Uint8List macKey = hkdfExpand(key, toUtf8('mac'), 32);
 
   return (encKey, macKey);
 }

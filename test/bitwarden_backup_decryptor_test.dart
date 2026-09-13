@@ -21,6 +21,7 @@ import 'dart:typed_data';
 import 'package:bitwarden_backup_decryptor/bitwarden_backup_decryptor.dart';
 import 'package:bitwarden_backup_decryptor/src/create_test_vault.dart' as ctv;
 import 'package:bitwarden_backup_decryptor/src/crypto.dart';
+import 'package:cipherlib/codecs.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -205,7 +206,7 @@ void main() {
       );
       expect(
         aesCbc(Uint8List(16), Uint8List(16), Uint8List(16), true),
-        base64Url.decode('ZulL1O-KLDuITPpZyjQrLg=='),
+        fromBase64('ZulL1O-KLDuITPpZyjQrLg==', codec: Base64Codec.urlSafe),
       );
     });
   }, timeout: Timeout(Duration(seconds: 30)));

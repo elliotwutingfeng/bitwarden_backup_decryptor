@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bitwarden_backup_decryptor/src/crypto.dart';
+import 'package:cipherlib/codecs.dart';
 
 class IncorrectPasswordException implements Exception {
   final String message;
@@ -37,9 +37,9 @@ String _decrypt(
       params[0].substring(0, 2) != '2.') {
     throw FormatException('Invalid vault format');
   }
-  final Uint8List iv = base64.decode(params[0].substring(2));
-  final Uint8List vault = base64.decode(params[1]);
-  final Uint8List mac = base64.decode(params[2]);
+  final Uint8List iv = fromBase64(params[0].substring(2));
+  final Uint8List vault = fromBase64(params[1]);
+  final Uint8List mac = fromBase64(params[2]);
 
   final Uint8List b =
       (BytesBuilder()
@@ -53,7 +53,7 @@ String _decrypt(
 
   final Uint8List decryptor = aesCbc(encKey, iv, vault, false);
   final Uint8List unpadder = unpad(decryptor);
-  return utf8.decode(unpadder);
+  return fromUtf8(unpadder);
 }
 
 /// Decrypt [vault] with [passphrase] and return result as plaintext.
