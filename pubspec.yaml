@@ -13,7 +13,7 @@ topics:
 publish_to: 'none'
 
 environment:
-  sdk: ^3.10.0
+  sdk: ^3.11.0
 
 dependencies:
   cipherlib: ^0.7.2
